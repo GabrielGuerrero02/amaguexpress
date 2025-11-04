@@ -1,0 +1,41 @@
+import 'package:flutter/material.dart';
+import 'package:amaguexpress/constants/constants.dart';
+import 'package:amaguexpress/generated/l10n.dart';
+import 'package:amaguexpress/src/screens/main/tab1_controller.dart';
+
+class FilterInput extends StatelessWidget {
+  const FilterInput({
+    super.key,
+    required this.tab1Controller,
+  });
+
+  final Tab1Controller tab1Controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding * 0.75),
+      margin: const EdgeInsets.symmetric(horizontal: kDefaultPadding * 0.5),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(255, 255, 255, 255),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.black, // Borde negro
+          width: 1, // Delgado
+        ),
+      ),
+      child: TextField(
+        keyboardType: TextInputType.name,
+        textCapitalization: TextCapitalization.words,
+        decoration: InputDecoration(
+          icon: const Icon(Icons.search_outlined, color: kPrimaryColor),
+          hintText: S.of(context).hFilter,
+          border: InputBorder.none,
+        ),
+        onChanged: (value) {
+          tab1Controller.filterCompanies(value);
+        },
+      ),
+    );
+  }
+}

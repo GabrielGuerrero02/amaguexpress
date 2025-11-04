@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Kajita Kushki</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.kushkipagos.com/kushki-checkout.js"></script>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #kushki-checkout {
+        width: 100vw;
+        min-width: 320px;
+        max-width: 100vw;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="kushki-checkout"></div>
+    <script>
+      const kushki = new KushkiCheckout({
+        form: "kushki-checkout",
+        merchant_id: "d4802982be1a4d7e9fcdc409858281a4",
+        amount: 1.00,
+        currency: "USD",
+        payment_methods: ["card"],
+        onTokenCreated: function(token) {
+          if (window.KushkiChannel) {
+            window.KushkiChannel.postMessage(token);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

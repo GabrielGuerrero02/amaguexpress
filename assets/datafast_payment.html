@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Pago Datafast</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        width: 100vw;
+        height: 100vh;
+      }
+      .paymentWidgets {
+        width: 100vw !important;
+        min-width: 100vw !important;
+        box-sizing: border-box;
+        margin: 0 auto;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <form id="datafastForm" action="https://tusitio.com/resultado" class="paymentWidgets" data-brands="VISA MASTER AMEX"></form>
+    <script>
+      // El checkoutId será reemplazado por Flutter
+      var checkoutId = '__CHECKOUT_ID__';
+      var script = document.createElement('script');
+      script.src = "https://test.oppwa.com/v1/paymentWidgets.js?checkoutId=" + checkoutId;
+      document.head.appendChild(script);
+    </script>
+  </body>
+</html>
