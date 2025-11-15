@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 const kPrimaryColor = Color.fromARGB(255, 239, 136, 0);
 const kSecondaryColor = Color.fromARGB(255, 63, 52, 52);
 
-const kContentColorLightTheme = Color.fromARGB(255, 90, 80, 52);
+const kContentColorLightTheme = Color.fromARGB(255, 41, 37, 25);
 const kContentColorDarkTheme = Color.fromARGB(255, 213, 135, 0);
 
 const kWarninngColor = Color.fromARGB(255, 1, 95, 235);
 const kErrorColor = Color(0xFFF03738);
 const kDefaultPadding = 20.0;
 
-const kVersionn = '3.50.501';
+const kVersionn = '4.00.001';
 const kNameApp = 'AmaguExpress';
 
 const kImageDeliveryManDefault =

@@ -35,7 +35,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 35
+    compileSdkVersion 36
     namespace "com.amaguexpress.delivery" 
     ndkVersion "27.0.12077973"
 

@@ -27,25 +27,48 @@ ThemeData lightThemeData(BuildContext context) {
 }
 
 ThemeData darkThemeData(BuildContext context) {
-  return ThemeData.dark().copyWith(
+  final base = ThemeData.dark();
+
+  return base.copyWith(
     primaryColor: kPrimaryColor,
-    scaffoldBackgroundColor: kContentColorLightTheme,
-    appBarTheme: appBarTheme,
-    iconTheme: const IconThemeData(color: kContentColorDarkTheme),
+    // Fondo oscuro moderno
+    scaffoldBackgroundColor: const Color(0xFF121212),
+    // AppBar con buen contraste
+    appBarTheme: appBarTheme.copyWith(
+      backgroundColor: const Color(0xFF1E1E1E),
+      foregroundColor: Colors.white,
+      elevation: 0,
+    ),
+    // Íconos claros sobre fondo oscuro
+    iconTheme: const IconThemeData(color: Color(0xFFE0E0E0)),
+    // Tipografías legibles en oscuro
     textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme)
-        .apply(bodyColor: kContentColorDarkTheme, fontSizeFactor: 0.8),
-    colorScheme: const ColorScheme.dark().copyWith(
+        .apply(bodyColor: const Color(0xFFE0E0E0), fontSizeFactor: 0.8),
+    // Esquema de colores coherente en oscuro
+    colorScheme: base.colorScheme.copyWith(
       primary: kPrimaryColor,
       secondary: kSecondaryColor,
       error: kErrorColor,
+      surface: const Color(0xFF1E1E1E),
+      background: const Color(0xFF121212),
+      onSurface: const Color(0xFFE0E0E0),
+      onPrimary: Colors.white,
     ),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: kContentColorLightTheme,
-      selectedItemColor: Colors.white70,
-      unselectedItemColor:
-          kContentColorDarkTheme.withValues(alpha: (0.32 * 255)),
-      selectedIconTheme: const IconThemeData(color: kPrimaryColor),
+    // Tarjetas/paneles con superficie más clara que el fondo
+    cardColor: const Color(0xFF1E1E1E),
+    // Bottom bar con mejor contraste y acentos
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Color(0xFF1E1E1E),
+      selectedItemColor: kPrimaryColor,
+      unselectedItemColor: Color(0xFF9E9E9E),
+      selectedIconTheme: IconThemeData(color: kPrimaryColor),
       showUnselectedLabels: true,
+    ),
+    // Divisores sutiles
+    dividerColor: const Color(0xFF2C2C2C),
+    popupMenuTheme: const PopupMenuThemeData(
+      color: Color(0xFF1E1E1E),
+      textStyle: TextStyle(color: Color(0xFFE0E0E0)),
     ),
   );
 }
