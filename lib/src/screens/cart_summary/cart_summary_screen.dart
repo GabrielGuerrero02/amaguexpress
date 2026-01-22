@@ -8,13 +8,27 @@ import 'package:amaguexpress/constants/constants.dart';
 
 class CartSummaryScreen extends StatelessWidget {
   final bool isSumaryTaxi;
+  final bool isSummaryNat;
+  final double? fromLtNat;
+  final double? fromLgNat;
 
-  const CartSummaryScreen({super.key, this.isSumaryTaxi = false});
+  const CartSummaryScreen({
+    super.key,
+    this.isSumaryTaxi = false,
+    this.isSummaryNat = false,
+    this.fromLtNat,
+    this.fromLgNat,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<CartSummaryController>.value(
-      value: CartSummaryController(isSumaryTaxi: isSumaryTaxi),
+      value: CartSummaryController(
+        isSumaryTaxi: isSumaryTaxi,
+        isSummaryNat: isSummaryNat,
+        fromLtNat: fromLtNat,
+        fromLgNat: fromLgNat,
+      ),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: kPrimaryColor, // Usa tu color primario

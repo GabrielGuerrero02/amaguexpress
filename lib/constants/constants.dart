@@ -47,4 +47,4 @@ const kTargetWidthStore = 470;
 const kTargetWidthProduct = 440;
 
 const kMaximumDistanceStoreStartingPoint = 11111;
-const kMinimumTravelDistance = 300;
+const kMinimumTravelDistance = 100;

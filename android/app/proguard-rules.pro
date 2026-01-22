@@ -5,11 +5,11 @@
 -dontwarn com.stripe.android.pushProvisioning.PushProvisioningEphemeralKeyProvider
 
 #Flutter Wrapper
--keep class io.flutter.app.** { *; }
+#-keep class io.flutter.app.** { *; }
 -keep class io.flutter.plugin.**  { *; }
 -keep class io.flutter.util.**  { *; }
 -keep class io.flutter.view.**  { *; }
--keep class io.flutter.**  { *; }
+#-keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.**  { *; }
 -keep class com.google.firebase.** { *; }
 -keep class com.dexterous.** { *; }
@@ -38,5 +38,5 @@
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 
 # Flutter Play Core dependencies
--keep class com.google.android.play.** { *; }
--keep interface com.google.android.play.** { *; }
+#-keep class com.google.android.play.** { *; }
+#-keep interface com.google.android.play.** { *; }

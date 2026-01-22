@@ -31,6 +31,12 @@ class ConfirmationDialog extends StatelessWidget {
         !showButtonCancell
             ? Container()
             : OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kPrimaryColor,
+                  backgroundColor: const Color.fromARGB(255, 67, 65, 65),
+                  side: const BorderSide(
+                      color: Color.fromARGB(255, 77, 77, 77), width: 1),
+                ),
                 onPressed: () {
                   if (onPressedCancell == null) {
                     Navigator.of(context).pop();

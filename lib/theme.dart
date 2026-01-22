@@ -36,19 +36,19 @@ ThemeData darkThemeData(BuildContext context) {
     // AppBar con buen contraste
     appBarTheme: appBarTheme.copyWith(
       backgroundColor: const Color(0xFF1E1E1E),
-      foregroundColor: Colors.white,
+      foregroundColor: const Color.fromARGB(255, 48, 48, 48),
       elevation: 0,
     ),
     // Íconos claros sobre fondo oscuro
     iconTheme: const IconThemeData(color: Color(0xFFE0E0E0)),
     // Tipografías legibles en oscuro
-    textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme)
-        .apply(bodyColor: const Color(0xFFE0E0E0), fontSizeFactor: 0.8),
+    textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme).apply(
+        bodyColor: const Color.fromARGB(255, 97, 97, 97), fontSizeFactor: 0.8),
     // Esquema de colores coherente en oscuro
     colorScheme: base.colorScheme.copyWith(
       primary: kPrimaryColor,
       secondary: kSecondaryColor,
-      error: kErrorColor,
+      error: const Color.fromARGB(255, 202, 106, 106),
       surface: const Color(0xFF1E1E1E),
       background: const Color(0xFF121212),
       onSurface: const Color(0xFFE0E0E0),

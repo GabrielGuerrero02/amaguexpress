@@ -69,6 +69,13 @@ class DeliverDialog extends StatelessWidget {
       ]),
       actions: [
         OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            backgroundColor:
+                const Color.fromARGB(255, 75, 72, 72), // gris claro
+            foregroundColor: kPrimaryColor, // texto e ícono naranja
+            side: const BorderSide(color: Colors.grey),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
           onPressed: () {
             if (onPressedCancell == null) {
               Navigator.of(context).pop();
@@ -87,6 +94,11 @@ class DeliverDialog extends StatelessWidget {
           ),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: kPrimaryColor,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
           onPressed: () {
             Navigator.of(context).pop();
             onPressedOk();

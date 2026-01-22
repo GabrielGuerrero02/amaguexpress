@@ -17,8 +17,8 @@ class ButtonClientDirection extends StatelessWidget {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0))),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0))),
       label: Text(
         S.of(context).bRouteClient,
         style: const TextStyle(color: kPrimaryColor),

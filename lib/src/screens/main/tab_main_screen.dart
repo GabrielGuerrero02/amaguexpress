@@ -29,8 +29,16 @@ class TabMainScreen extends StatelessWidget {
           title: tabManController.currentScreen == 0
               ? SelectedAddress(tab1Controller: tab1Controller)
               : Text(S.of(context).tAppBarOrders),
-          actions: const [
-            IconCart(),
+          actions: [
+            if (tabManController.currentScreen == 1)
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                onPressed: () {
+                  Provider.of<Tab2Controller>(context, listen: false)
+                      .loadOrders();
+                },
+              ),
+            const IconCart(),
           ]),
       body: _Screens(tabManController),
       bottomNavigationBar: const _Navigation(),

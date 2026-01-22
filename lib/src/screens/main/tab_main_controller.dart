@@ -14,10 +14,21 @@ class TabManController with ChangeNotifier {
 
   set currentScreen(int current) {
     _currentScreen = current;
-
-    _pageController.animateToPage(current,
-        duration: const Duration(milliseconds: 250), curve: Curves.easeInOut);
     notifyListeners();
+
+    // Avoid crash when this controller is used outside the main PageView.
+    if (_pageController.hasClients) {
+      _pageController.animateToPage(
+        current,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      // Not attached to any PageView yet (or already disposed in the current route).
+      debugPrint(
+        '[TabManController] pageController.hasClients=false -> skip animateToPage (current=$current)',
+      );
+    }
   }
 
   Future<int> checkSession() async {

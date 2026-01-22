@@ -11,6 +11,26 @@ class DetailsProducts extends StatelessWidget {
 
   final CartSummaryModel cartSummary;
 
+  bool _isTechnicalNote(String note) {
+    final n = note.trim();
+    if (n.isEmpty) return false;
+
+    // Flag técnico de NAT (no debe verse en UI)
+    if (n.contains('NAT_DELIVERY_ONLY')) return true;
+
+    // Otros flags técnicos que uses con pipes
+    if (n.contains('|storeId=')) return true;
+
+    return false;
+  }
+
+  String _noteForUi(String note) {
+    final n = note.trim();
+    if (n.isEmpty) return '';
+    if (_isTechnicalNote(n)) return '';
+    return n;
+  }
+
   @override
   Widget build(BuildContext context) {
     return DataTable(
@@ -31,10 +51,11 @@ class DetailsProducts extends StatelessWidget {
     List<DataRow> rows = [];
     late String nota;
     for (var pr in cartSummary.products) {
-      nota = pr.note.isEmpty ? '' : ' (${pr.note})';
+      final noteUi = _noteForUi(pr.note);
+      nota = noteUi.isEmpty ? '' : ' ($noteUi)';
       rows.add(_dataRowElement(
           c1: '${pr.number}',
-          c2: '${pr.name} $nota',
+          c2: '${pr.name}$nota',
           c3: pr.total.toStringAsFixed(kCoinDecimals)));
     }
 

@@ -158,7 +158,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "lNumber": MessageLookupByLibrary.simpleMessage("Cantidad"),
         "lOrderBy": MessageLookupByLibrary.simpleMessage("Orden a cargo de"),
         "lPayCash": MessageLookupByLibrary.simpleMessage("Pagar en efectivo"),
-        "lPayMoney": MessageLookupByLibrary.simpleMessage("Pagar con tarjeta"),
+        "lPayMoney": MessageLookupByLibrary.simpleMessage(
+            "Pagar con tarjeta (Payphone App)"),
         "lPaymentMethods":
             MessageLookupByLibrary.simpleMessage("Métodos de pago"),
         "lPrice": MessageLookupByLibrary.simpleMessage("Precio"),

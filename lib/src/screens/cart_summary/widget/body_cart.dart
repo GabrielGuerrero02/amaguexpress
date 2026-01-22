@@ -19,7 +19,6 @@ import 'package:amaguexpress/src/widgets/payment_dropdown/payment_dropdown_contr
 import 'package:amaguexpress/src/widgets/primary_button.dart';
 import 'package:provider/provider.dart';
 import 'package:amaguexpress/src/screens/cart_summary/payphone_webview.dart';
-import 'package:amaguexpress/src/screens/cart_summary/confirm_payphone_screen.dart';
 
 class BodyCart extends StatelessWidget {
   const BodyCart({
@@ -144,16 +143,30 @@ class BodyCart extends StatelessWidget {
     AddressModel? address = await DBProvider.db.loadAddress();
 
     if (address == null || address.id <= 0) {
-      scaffoldMessenger.showSnackBar(SnackBar(
-          backgroundColor: kErrorColor, content: Text(s.bSelectAddress)));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(backgroundColor: kErrorColor, content: Text(s.bSelectAddress)),
+      );
       return;
     }
 
-    // ✅ Mantienes tu validación estricta de dirección (si no coincide, se corta)
-    if (address.id !=
-        int.parse(addressDropdownController.dropdown.value.toString())) {
-      scaffoldMessenger.showSnackBar(SnackBar(
-          backgroundColor: kErrorColor, content: Text(s.bSelectAddress)));
+    // ✅ Evita el falso mensaje de “Seleccione una dirección”:
+    // En algunos flujos (ej. NAT) el dropdown puede quedar en 0 o desincronizado
+    // aunque ya exista una dirección válida guardada en DB.
+    final currentDropdownId =
+        int.tryParse(addressDropdownController.dropdown.value.toString()) ?? 0;
+
+    if (currentDropdownId == 0 || currentDropdownId != address.id) {
+      addressDropdownController.dropdown.value = address.id.toString();
+    }
+
+    // Si por alguna razón extrema sigue sin coincidir, mantenemos el corte.
+    final verifiedDropdownId =
+        int.tryParse(addressDropdownController.dropdown.value.toString()) ?? 0;
+
+    if (verifiedDropdownId != address.id) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(backgroundColor: kErrorColor, content: Text(s.bSelectAddress)),
+      );
       if (kDebugMode) {
         print('Serious error. Address does not correspond');
       }
@@ -181,7 +194,9 @@ class BodyCart extends StatelessWidget {
         }
       ];
 
-      final result = await Navigator.push(
+      // PayPhoneWebView ahora gestiona la verificación y luego navega a ConfirmPayPhoneScreen
+      // internamente (pushReplacement). Por eso aquí solo esperamos un bool de confirmación.
+      final confirmed = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (_) => PayPhoneWebView(
@@ -192,50 +207,32 @@ class BodyCart extends StatelessWidget {
         ),
       );
 
-      if (result == null ||
-          result['transactionId'] == null ||
-          result['clientTxId'] == null) {
-        scaffoldMessenger.showSnackBar(SnackBar(
-          backgroundColor: kErrorColor,
-          content: Text(s.errUnknown),
-        ));
+      // Si el usuario canceló o no se aprobó, no hacemos buy().
+      if (confirmed != true) return;
+
+      if (kDebugMode) {
+        print(
+            '[BODY_CART] PayPhone confirmado -> ejecutando buy(TypesPayment.money)');
+      }
+
+      final success = await cartSummaryController.buy(TypesPayment.money);
+
+      if (!success) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(backgroundColor: kErrorColor, content: Text(s.errUnknown)),
+        );
         return;
       }
-      if (kDebugMode) {
-        print('[BODY_CART] WebView ok -> txId: ' +
-            result['transactionId'].toString() +
-            '  clientTxId: ' +
-            result['clientTxId'].toString());
-      }
 
-      final String transactionId = result['transactionId'].toString();
-      final String clientTxId = result['clientTxId'].toString();
+      // Navegación/refresh igual al flujo de efectivo
+      navigator.popUntil((route) => route.isFirst);
+      tabManController.currentScreen = 1;
 
-      // Abre la pantalla de confirmación: POST /confirm y luego buy(...)
-      final confirmed = await Navigator.push<bool>(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ConfirmPayPhoneScreen(
-            transactionId: transactionId,
-            clientTxId: clientTxId,
-          ),
-        ),
-      );
+      tab1Controller.load();
+      tab2Controller.loadOrders();
+      iconCartController.count();
 
-      // Si la pantalla de confirmación decide devolver true, refrescamos vistas aquí mismo
-      // (si ya manejó la navegación internamente, esto simplemente no hará nada visible).
-      if (confirmed == true) {
-        if (kDebugMode) {
-          print(
-              '[BODY_CART] ConfirmPayPhoneScreen -> confirmed=true, refrescando UI');
-        }
-        // Refresca contadores y pestañas, sin navegar a otra ruta aquí.
-        tab1Controller.load();
-        tab2Controller.loadOrders();
-        iconCartController.count();
-        paymentController.isPaymentSelected = false;
-      }
-
+      paymentController.isPaymentSelected = false;
       return;
     }
     // =================== FIN TARJETA (PayPhone) ===================

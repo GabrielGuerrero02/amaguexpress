@@ -23,11 +23,17 @@ class ConfirmPayPhoneScreen extends StatefulWidget {
 class _ConfirmPayPhoneScreenState extends State<ConfirmPayPhoneScreen> {
   String statusMessage = 'Confirmando el pago...';
   bool success = false;
+  bool loading = true;
+  bool _didRun = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _run());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_didRun) return;
+      _didRun = true;
+      _run();
+    });
   }
 
   Future<void> _run() async {
@@ -36,6 +42,15 @@ class _ConfirmPayPhoneScreenState extends State<ConfirmPayPhoneScreen> {
     final tab1 = context.read<Tab1Controller>();
     final tab2 = context.read<Tab2Controller>();
     final iconCart = context.read<IconCartController>();
+
+    // UI state
+    if (mounted) {
+      setState(() {
+        loading = true;
+        success = false;
+        statusMessage = 'Confirmando el pago...';
+      });
+    }
 
     final ok = await cart.confirmPayPhoneAndBuy(
       widget.transactionId,
@@ -47,10 +62,9 @@ class _ConfirmPayPhoneScreenState extends State<ConfirmPayPhoneScreen> {
     if (ok) {
       setState(() {
         success = true;
-        statusMessage = '✅ Pago confirmado, creando pedido...';
+        loading = false;
+        statusMessage = 'Pago aprobado. Generando tu pedido...';
       });
-
-      await Future.delayed(const Duration(seconds: 8));
 
       // Volver a la pantalla principal y refrescar
       Navigator.popUntil(context, (r) => r.isFirst);
@@ -61,7 +75,8 @@ class _ConfirmPayPhoneScreenState extends State<ConfirmPayPhoneScreen> {
     } else {
       setState(() {
         success = false;
-        statusMessage = '❌ No se pudo confirmar el pago.';
+        loading = false;
+        statusMessage = 'No se pudo confirmar el pago. Intenta nuevamente.';
       });
     }
   }
@@ -71,18 +86,47 @@ class _ConfirmPayPhoneScreenState extends State<ConfirmPayPhoneScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Confirmación de pago')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            success
-                ? const Icon(Icons.check_circle, color: Colors.green, size: 64)
-                : const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(statusMessage, textAlign: TextAlign.center),
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (loading) ...[
+                const CircularProgressIndicator(),
+              ] else if (success) ...[
+                const Icon(Icons.check_circle, color: Colors.green, size: 72),
+              ] else ...[
+                const Icon(Icons.error_outline, color: Colors.red, size: 72),
+              ],
+              const SizedBox(height: 16),
+              Text(
+                statusMessage,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 20),
+              if (!loading && !success) ...[
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: _run,
+                    child: const Text('Reintentar'),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).maybePop(),
+                    child: const Text('Volver'),
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

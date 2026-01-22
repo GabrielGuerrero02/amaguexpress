@@ -74,11 +74,16 @@ class RequestsController with ChangeNotifier {
       String orderedAt = selectedDay.toString().split(' ')[0];
       _requests = await requestService.history(orderedAt);
     }
+    _rebuildStoresFromRequests();
     inAsyncCall = false;
     notifyListeners();
   }
 
   List<RequestModel> _requests = [];
+
+  List<StoreOption> _stores = [];
+
+  List<StoreOption> get stores => _stores;
 
   get requests => _requests;
 
@@ -104,10 +109,81 @@ class RequestsController with ChangeNotifier {
     return CodeError.unauthorized;
   }
 
+  void _rebuildStoresFromRequests() {
+    final Map<int, String> unique = {};
+
+    for (final req in _requests) {
+      final dynamic r = req;
+
+      int? id;
+      String? name;
+
+      // Best-effort extraction across possible shapes
+      try {
+        final dynamic v = r.storeId;
+        if (v != null) id = int.tryParse(v.toString());
+      } catch (_) {}
+      try {
+        final dynamic v = r.companyId;
+        if (id == null && v != null) id = int.tryParse(v.toString());
+      } catch (_) {}
+      try {
+        final dynamic v = r.store?.id;
+        if (id == null && v != null) id = int.tryParse(v.toString());
+      } catch (_) {}
+      try {
+        final dynamic v = r.company?.id;
+        if (id == null && v != null) id = int.tryParse(v.toString());
+      } catch (_) {}
+
+      try {
+        final dynamic v = r.storeName;
+        if (v != null) name = v.toString();
+      } catch (_) {}
+      try {
+        final dynamic v = r.companyName;
+        if ((name == null || name!.trim().isEmpty) && v != null) {
+          name = v.toString();
+        }
+      } catch (_) {}
+      try {
+        final dynamic v = r.store?.name;
+        if ((name == null || name!.trim().isEmpty) && v != null) {
+          name = v.toString();
+        }
+      } catch (_) {}
+      try {
+        final dynamic v = r.company?.name;
+        if ((name == null || name!.trim().isEmpty) && v != null) {
+          name = v.toString();
+        }
+      } catch (_) {}
+
+      if (id == null) continue;
+      final safeName = (name ?? 'Tienda $id').trim();
+      unique[id] = safeName.isEmpty ? 'Tienda $id' : safeName;
+    }
+
+    final List<StoreOption> next = unique.entries
+        .map((e) => StoreOption(id: e.key, name: e.value))
+        .toList()
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+
+    _stores = next;
+  }
+
   removeOrder(RequestModel request) {
     final index = _requests.indexWhere((pr) => pr.id == request.id);
     if (index < 0) return;
     _requests.removeAt(index);
+    _rebuildStoresFromRequests();
     notifyListeners();
   }
+}
+
+class StoreOption {
+  final int id;
+  final String name;
+
+  const StoreOption({required this.id, required this.name});
 }

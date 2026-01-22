@@ -62,7 +62,7 @@
     "lselectPayment" : "Selecciona un método de pago",
     "lselectGroup" : "Selecciona un grupo",
     "lPayCash" : "Pagar en efectivo",
-    "lPayMoney" : "Pagar con tarjeta",
+    "lPayMoney" : "Pagar con tarjeta (Payphone App)",
     "lTMoneyValid" : "Money. Válido sólo con tarjeta de crédito",
     "lHMoneyValid" : "Este importe reduce automáticamente el pago",
     "lHBalanceValid" : "Balance para poder tomar pedidos",

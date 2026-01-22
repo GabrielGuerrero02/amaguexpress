@@ -20,7 +20,7 @@ class FloatingButtonWhatsapp extends StatelessWidget {
             top: 120,
             right: kDefaultPadding,
             child: CircularButton(
-              icon: const Icon(Icons.whatshot_outlined,
+              icon: const Icon(Icons.chat_bubble_outline,
                   color: kPrimaryColor, size: 40),
               onPressed: () {
                 sendWhatsapp(petition.store.contact,

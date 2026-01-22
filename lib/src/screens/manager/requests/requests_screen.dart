@@ -5,6 +5,7 @@ import 'package:amaguexpress/src/screens/manager/requests/widget/content_request
 import 'package:amaguexpress/src/widgets/drawer_menu.dart';
 import 'package:provider/provider.dart';
 import 'package:amaguexpress/constants/constants.dart';
+import 'package:amaguexpress/src/screens/store/nat_screen.dart';
 
 class RequestsScreen extends StatelessWidget {
   const RequestsScreen({super.key});
@@ -19,6 +20,20 @@ class RequestsScreen extends StatelessWidget {
         title: requestsController.currentScreen == 0
             ? Text(S.of(context).tRequests)
             : Text(S.of(context).tRequestsHistory),
+        actions: [
+          if (requestsController.currentScreen == 0)
+            IconButton(
+              tooltip: 'Solicitar motorizado',
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => NatScreen(),
+                  ),
+                );
+              },
+            ),
+        ],
       ),
       body: ContentRequests(requestsController: requestsController),
       bottomNavigationBar: const _Navigation(),
