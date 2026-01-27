@@ -28,14 +28,22 @@ class PushProvider {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
+  // IMPORTANT: Use a NEW channel id when changing sound (Android 8+ caches channel settings).
+  static const String _androidOrdersChannelId =
+      '${kNameApp}_CHANNEL_AMAGUEXPRESS_V2';
+
   final AndroidNotificationDetails androidPlatformChannelSpecifics =
-      const AndroidNotificationDetails('${kNameApp}_CHANNEL_AMAGUEXPRESS',
-          '$kNameApp NOTIFICATIONS AMAGUEXPRESS',
-          groupKey: '$kNameApp-NOTIFICATIONS-AMAGUEXPRESS',
-          playSound: true,
-          autoCancel: true,
-          importance: Importance.max,
-          priority: Priority.high);
+      const AndroidNotificationDetails(
+    _androidOrdersChannelId,
+    '$kNameApp NOTIFICATIONS AMAGUEXPRESS',
+    channelDescription: '$kNameApp order notifications (custom sound)',
+    groupKey: '$kNameApp-NOTIFICATIONS-AMAGUEXPRESS',
+    playSound: true,
+    sound: RawResourceAndroidNotificationSound('notification1'),
+    importance: Importance.max,
+    priority: Priority.high,
+    autoCancel: true,
+  );
 
   final StreamController<Map<String, dynamic>> _notificationsStream =
       StreamController<Map<String, dynamic>>.broadcast();
@@ -43,12 +51,11 @@ class PushProvider {
   Stream<Map<String, dynamic>> get notifications => _notificationsStream.stream;
 
   getToken() async {
-    _firebaseMessaging.setForegroundNotificationPresentationOptions(
-        alert: true, badge: true, sound: true);
     await _firebaseMessaging.requestPermission(
         alert: true, sound: true, badge: true);
     _firebaseMessaging.getToken().then((tokenPush) {
       if (tokenPush != null) {
+        debugPrint('[PUSH] FCM token: $tokenPush');
         prefs.tokenPush = tokenPush;
         if (prefs.isAuth) _authService.updateTokenPush(tokenPush);
       }
@@ -62,6 +69,7 @@ class PushProvider {
         presentAlert: true,
         presentSound: true,
         presentBadge: true,
+        sound: 'notification1.caf',
       ),
     );
     _localNotifications.show(
@@ -75,6 +83,24 @@ class PushProvider {
   init() async {
     await shouldShowRequestPermissionRationale();
 
+    // iOS: ensure permissions + foreground presentation are configured before listeners.
+    await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // Keep token updated (iOS tokens can rotate).
+    _firebaseMessaging.onTokenRefresh.listen((tokenPush) {
+      prefs.tokenPush = tokenPush;
+      if (prefs.isAuth) _authService.updateTokenPush(tokenPush);
+    });
+
     FirebaseMessaging.onMessage.listen(_onMessageHandler);
     FirebaseMessaging.onBackgroundMessage(_messageHandler);
 
@@ -87,7 +113,11 @@ class PushProvider {
   Future<void> initializeLocalNotifications() async {
     const initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initializationSettingsIOS = DarwinInitializationSettings();
+    const initializationSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
     const initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
@@ -101,10 +131,12 @@ class PushProvider {
             AndroidFlutterLocalNotificationsPlugin>();
     if (androidImpl != null) {
       final channel = AndroidNotificationChannel(
-        '${kNameApp}_CHANNEL_AMAGUEXPRESS',
+        _androidOrdersChannelId,
         '$kNameApp NOTIFICATIONS AMAGUEXPRESS',
-        description: '$kNameApp default notification channel',
+        description: '$kNameApp order notifications (custom sound)',
         importance: Importance.max,
+        playSound: true,
+        sound: const RawResourceAndroidNotificationSound('notification1'),
       );
       await androidImpl.createNotificationChannel(channel);
     }
@@ -142,21 +174,44 @@ class PushProvider {
   }
 
   Future _onMessageHandler(RemoteMessage message) async {
-    if (!message.data.containsKey('type')) return;
-    _notificationsStream.add(message.data);
+    // iOS can deliver `notification` payloads without `data`.
+    if (message.data.isNotEmpty) {
+      _notificationsStream.add(message.data);
+    } else if (message.notification != null) {
+      _notificationsStream.add({
+        'title': message.notification?.title,
+        'body': message.notification?.body,
+      });
+    }
+
     checkMessage(message);
   }
 
   checkMessage(RemoteMessage message) {
     String? title, body;
+
+    // 1) Prefer explicit title/body in data (current behavior)
     if (message.data.containsKey('title') && message.data.containsKey('body')) {
       title = message.data['title'];
       body = message.data['body'];
-    } else if (message.data['type'] == TypesNotification.changeOrderStatust) {
-      title = kNameApp;
-      body = statusOrderLabel(int.parse(message.data['status']),
-          int.parse(message.data['companyType']));
     }
+
+    // 2) If not present, try the FCM notification payload (common on iOS)
+    if ((title == null || body == null) && message.notification != null) {
+      title ??= message.notification?.title;
+      body ??= message.notification?.body;
+    }
+
+    // 3) Preserve special-case logic for status change notifications
+    if ((title == null || body == null) &&
+        message.data['type'] == TypesNotification.changeOrderStatust) {
+      title = kNameApp;
+      body = statusOrderLabel(
+        int.parse(message.data['status']),
+        int.parse(message.data['companyType']),
+      );
+    }
+
     if (title == null || body == null) return;
 
     PushProvider()
@@ -175,7 +230,6 @@ Future<void> _messageHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   await PreferencesProvider().init();
   await S.load(Locale(PreferencesProvider().locale));
-  if (!message.data.containsKey('type')) return;
   // Inicializar notificaciones locales en el isolate de background antes de mostrar
   await PushProvider().initializeLocalNotifications();
   PushProvider().checkMessage(message);

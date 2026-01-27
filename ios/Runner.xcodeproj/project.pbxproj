@@ -11,6 +11,7 @@
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		490CFA6C2EC838C1005D8CB8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 490CFA6B2EC838C1005D8CB8 /* GoogleService-Info.plist */; };
+		4917CC4C2F240A170004F3EB /* notification1.caf in Resources */ = {isa = PBXBuildFile; fileRef = 4917CC4B2F240A170004F3EB /* notification1.caf */; };
 		55F97D25757B440587BC5CA3 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B438F9966F0E2C128EFEB8CC /* Pods_Runner.framework */; };
 		5B43DEE396F27C2740D67EFA /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC30B76922A41DABCB0CFD23 /* Pods_RunnerTests.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
@@ -50,6 +51,8 @@
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		490CFA6B2EC838C1005D8CB8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4917CC4B2F240A170004F3EB /* notification1.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = notification1.caf; path = Runner/notification1.caf; sourceTree = "<group>"; };
+		494876082F228FB500ADCF3B /* Profile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Profile.xcconfig; sourceTree = "<group>"; };
 		6533A94692C205CE7B646BD3 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -124,6 +127,7 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
+				4917CC4B2F240A170004F3EB /* notification1.caf */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
@@ -131,6 +135,7 @@
 				80E9FE8682926E6C12A35FF5 /* Pods */,
 				490CFA6B2EC838C1005D8CB8 /* GoogleService-Info.plist */,
 				A08052540CE163C4C7B011CF /* Frameworks */,
+				494876082F228FB500ADCF3B /* Profile.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -263,6 +268,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4917CC4C2F240A170004F3EB /* notification1.caf in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				490CFA6C2EC838C1005D8CB8 /* GoogleService-Info.plist in Resources */,
@@ -282,13 +288,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -309,7 +311,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin";
+			shellScript = "set -e\n\nGENERATED_XCCONFIG=\"${SRCROOT}/Flutter/Generated.xcconfig\"\nFLUTTER_ROOT=$(grep -m1 '^FLUTTER_ROOT=' \"$GENERATED_XCCONFIG\" | cut -d= -f2-)\n\n\"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" embed_and_thin\n";
 		};
 		94236EC8B9545560EB43EFB2 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -346,7 +348,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+			shellScript = "set -e\n\nGENERATED_XCCONFIG=\"${SRCROOT}/Flutter/Generated.xcconfig\"\n\nif [ ! -f \"$GENERATED_XCCONFIG\" ]; then\n  echo \"ERROR: No existe $GENERATED_XCCONFIG\"\n  exit 1\nfi\n\nFLUTTER_ROOT=$(grep -m1 '^FLUTTER_ROOT=' \"$GENERATED_XCCONFIG\" | cut -d= -f2-)\n\nif [ -z \"$FLUTTER_ROOT\" ]; then\n  echo \"ERROR: FLUTTER_ROOT vacío (no se pudo leer desde Generated.xcconfig)\"\n  echo \"Contenido encontrado:\"\n  head -n 50 \"$GENERATED_XCCONFIG\"\n  exit 1\nfi\n\necho \"FLUTTER_ROOT=$FLUTTER_ROOT\"\nls -la \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\"\n\n\"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
 		};
 		D4BB14BB47DAC43FEE323FDC /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -356,13 +358,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -443,6 +441,7 @@
 /* Begin XCBuildConfiguration section */
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 494876082F228FB500ADCF3B /* Profile.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -497,7 +496,7 @@
 		};
 		249021D4217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
+			baseConfigurationReference = 494876082F228FB500ADCF3B /* Profile.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -510,6 +509,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				PACKAGE_CONFIG = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.amaguexpress.delivery;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -695,6 +695,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = Q845CTRGD2;
 				ENABLE_BITCODE = NO;
+				FLUTTER_ROOT = "";
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -719,6 +720,7 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = Q845CTRGD2;
 				ENABLE_BITCODE = NO;
+				FLUTTER_ROOT = "";
 				INFOPLIST_FILE = Runner/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
