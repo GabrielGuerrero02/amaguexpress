@@ -157,8 +157,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "lNumber": MessageLookupByLibrary.simpleMessage("Number"),
         "lOrderBy": MessageLookupByLibrary.simpleMessage("Order by"),
         "lPayCash": MessageLookupByLibrary.simpleMessage("Pay in cash"),
-        "lPayMoney": MessageLookupByLibrary.simpleMessage(
-            "Pay by credit card (Payphone App)"),
+        "lPayMoney": MessageLookupByLibrary.simpleMessage("Pay by credit card"),
         "lPaymentMethods":
             MessageLookupByLibrary.simpleMessage("Payment methods"),
         "lPrice": MessageLookupByLibrary.simpleMessage("Price"),

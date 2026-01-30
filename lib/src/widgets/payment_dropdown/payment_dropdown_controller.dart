@@ -67,6 +67,8 @@ class PaymentDropdownController extends ChangeNotifier {
       PaymentModel(name: S.current.lPayCash, type: TypesPayment.cash);
   final PaymentModel paymentMoney =
       PaymentModel(name: S.current.lPayMoney, type: TypesPayment.money);
+  final PaymentModel paymentTransfer =
+      PaymentModel(name: 'Transferencia', type: TypesPayment.transfer);
 
   loadPayment() async {
     inAsyncCall = true;
@@ -75,6 +77,7 @@ class PaymentDropdownController extends ChangeNotifier {
 
     _payments.add(paymentCash);
     _payments.add(paymentMoney);
+    _payments.add(paymentTransfer);
 
     setPaymentItems(payments);
     inAsyncCall = false;

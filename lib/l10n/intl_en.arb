@@ -62,7 +62,7 @@
     "lselectPayment" : "Select a payment method",
     "lselectGroup" : "Select a group",
     "lPayCash" : "Pay in cash",
-    "lPayMoney" : "Pay by credit card (Payphone App)",
+    "lPayMoney" : "Pay by credit card",
     "lTMoneyValid" : "Money. Valid only with credit card",
     "lHMoneyValid" : "This amount automatically reduces the payment",
     "lHBalanceValid" : "Balance to be able to take orders",

@@ -17,6 +17,9 @@ class TypesPayment {
   // Credit card
   static const int money = 6002;
 
+  // Bank transfer (wait for balance, then buy with balance)
+  static const int transfer = 6003;
+
   static const int none = 0;
 }
 

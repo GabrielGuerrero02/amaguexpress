@@ -28,31 +28,68 @@ class PushProvider {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
+  // IMPORTANT: Android 8+ caches channel settings; use a NEW id when changing sound.
+  static const String _androidOrdersChannelId =
+      '${kNameApp}_CHANNEL_AMAGUEXPRESS_V2';
+
   final AndroidNotificationDetails androidPlatformChannelSpecifics =
-      const AndroidNotificationDetails('${kNameApp}_CHANNEL_AMAGUEXPRESS',
-          '$kNameApp NOTIFICATIONS AMAGUEXPRESS',
-          groupKey: '$kNameApp-NOTIFICATIONS-AMAGUEXPRESS',
-          playSound: true,
-          autoCancel: true,
-          importance: Importance.max,
-          priority: Priority.high);
+      const AndroidNotificationDetails(
+    _androidOrdersChannelId,
+    '$kNameApp NOTIFICATIONS AMAGUEXPRESS',
+    channelDescription: '$kNameApp order notifications (custom sound)',
+    groupKey: '$kNameApp-NOTIFICATIONS-AMAGUEXPRESS',
+    playSound: true,
+    sound: RawResourceAndroidNotificationSound('notification1'),
+    autoCancel: true,
+    importance: Importance.max,
+    priority: Priority.high,
+  );
 
   final StreamController<Map<String, dynamic>> _notificationsStream =
       StreamController<Map<String, dynamic>>.broadcast();
 
   Stream<Map<String, dynamic>> get notifications => _notificationsStream.stream;
 
-  getToken() async {
-    _firebaseMessaging.setForegroundNotificationPresentationOptions(
-        alert: true, badge: true, sound: true);
+  Future<void> getToken() async {
+    // Request permissions (iOS prompts only once; Android may no-op depending on SDK).
     await _firebaseMessaging.requestPermission(
-        alert: true, sound: true, badge: true);
-    _firebaseMessaging.getToken().then((tokenPush) {
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // iOS: ensure notifications are presented while app is in foreground.
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    try {
+      final apnsToken = await _firebaseMessaging.getAPNSToken();
+      debugPrint('[PUSH] APNs token: ${apnsToken ?? "<null>"}');
+
+      final tokenPush = await _firebaseMessaging.getToken();
+      debugPrint('[PUSH] FCM token: ${tokenPush ?? "<null>"}');
+
       if (tokenPush != null) {
         prefs.tokenPush = tokenPush;
-        if (prefs.isAuth) _authService.updateTokenPush(tokenPush);
+        if (prefs.isAuth) {
+          await _authService.updateTokenPush(tokenPush);
+        }
       }
-    }).catchError((error) {});
+
+      // Keep backend updated if FCM token rotates.
+      _firebaseMessaging.onTokenRefresh.listen((newToken) async {
+        debugPrint('[PUSH] FCM token refreshed: $newToken');
+        prefs.tokenPush = newToken;
+        if (prefs.isAuth) {
+          await _authService.updateTokenPush(newToken);
+        }
+      });
+    } catch (e) {
+      debugPrint('[PUSH] Error getting tokens: $e');
+    }
   }
 
   Future showNotification(RemoteNotification push) async {
@@ -62,6 +99,7 @@ class PushProvider {
         presentAlert: true,
         presentSound: true,
         presentBadge: true,
+        sound: 'notification1.caf',
       ),
     );
     _localNotifications.show(
@@ -72,22 +110,51 @@ class PushProvider {
     _localNotifications.cancelAll();
   }
 
-  init() async {
+  Future<void> init() async {
     await shouldShowRequestPermissionRationale();
 
+    // Configure permissions/presentation early (especially for iOS).
+    await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    // Foreground messages
     FirebaseMessaging.onMessage.listen(_onMessageHandler);
+
+    // When user taps a notification and the app opens/resumes
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      _onMessageHandler(message);
+    });
+
+    // If the app was terminated and opened via a notification
+    final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      await _onMessageHandler(initialMessage);
+    }
+
     FirebaseMessaging.onBackgroundMessage(_messageHandler);
 
     await initializeLocalNotifications();
 
-    getToken();
+    await getToken();
   }
 
   // Inicializa notificaciones locales y crea el canal en Android
   Future<void> initializeLocalNotifications() async {
     const initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initializationSettingsIOS = DarwinInitializationSettings();
+    const initializationSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
     const initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
@@ -101,10 +168,12 @@ class PushProvider {
             AndroidFlutterLocalNotificationsPlugin>();
     if (androidImpl != null) {
       final channel = AndroidNotificationChannel(
-        '${kNameApp}_CHANNEL_AMAGUEXPRESS',
+        _androidOrdersChannelId,
         '$kNameApp NOTIFICATIONS AMAGUEXPRESS',
-        description: '$kNameApp default notification channel',
+        description: '$kNameApp order notifications (custom sound)',
         importance: Importance.max,
+        playSound: true,
+        sound: const RawResourceAndroidNotificationSound('notification1'),
       );
       await androidImpl.createNotificationChannel(channel);
     }
@@ -142,21 +211,44 @@ class PushProvider {
   }
 
   Future _onMessageHandler(RemoteMessage message) async {
-    if (!message.data.containsKey('type')) return;
-    _notificationsStream.add(message.data);
+    // iOS can deliver `notification` payloads without `data`.
+    if (message.data.isNotEmpty) {
+      _notificationsStream.add(message.data);
+    } else if (message.notification != null) {
+      _notificationsStream.add({
+        'title': message.notification?.title,
+        'body': message.notification?.body,
+      });
+    }
+
     checkMessage(message);
   }
 
   checkMessage(RemoteMessage message) {
     String? title, body;
+
+    // 1) Prefer explicit title/body in data
     if (message.data.containsKey('title') && message.data.containsKey('body')) {
       title = message.data['title'];
       body = message.data['body'];
-    } else if (message.data['type'] == TypesNotification.changeOrderStatust) {
-      title = kNameApp;
-      body = statusOrderLabel(int.parse(message.data['status']),
-          int.parse(message.data['companyType']));
     }
+
+    // 2) Fall back to the FCM notification payload (common on iOS)
+    if ((title == null || body == null) && message.notification != null) {
+      title ??= message.notification?.title;
+      body ??= message.notification?.body;
+    }
+
+    // 3) Preserve special-case logic for status change notifications
+    if ((title == null || body == null) &&
+        message.data['type'] == TypesNotification.changeOrderStatust) {
+      title = kNameApp;
+      body = statusOrderLabel(
+        int.parse(message.data['status']),
+        int.parse(message.data['companyType']),
+      );
+    }
+
     if (title == null || body == null) return;
 
     PushProvider()
@@ -175,7 +267,6 @@ Future<void> _messageHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   await PreferencesProvider().init();
   await S.load(Locale(PreferencesProvider().locale));
-  if (!message.data.containsKey('type')) return;
   // Inicializar notificaciones locales en el isolate de background antes de mostrar
   await PushProvider().initializeLocalNotifications();
   PushProvider().checkMessage(message);

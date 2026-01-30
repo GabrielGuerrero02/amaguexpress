@@ -19,6 +19,7 @@ import 'package:amaguexpress/src/widgets/payment_dropdown/payment_dropdown_contr
 import 'package:amaguexpress/src/widgets/primary_button.dart';
 import 'package:provider/provider.dart';
 import 'package:amaguexpress/src/screens/cart_summary/payphone_webview.dart';
+import 'package:amaguexpress/src/screens/cart_summary/transfer_screen.dart';
 
 class BodyCart extends StatefulWidget {
   const BodyCart({
@@ -69,9 +70,13 @@ class _BodyCartState extends State<BodyCart> {
     final isCash = currentType == TypesPayment.cash;
     final wasCard = _lastPaymentType == TypesPayment.money;
     final isCard = currentType == TypesPayment.money;
+    final wasTransfer = _lastPaymentType == TypesPayment.transfer;
+    final isTransfer = currentType == TypesPayment.transfer;
 
-    // Solo disparar cuando cambia a efectivo o a tarjeta
-    if ((isCash && !wasCash) || (isCard && !wasCard)) {
+    // Solo disparar cuando cambia a efectivo o a tarjeta o a transferencia
+    if ((isCash && !wasCash) ||
+        (isCard && !wasCard) ||
+        (isTransfer && !wasTransfer)) {
       // Actualizamos inmediatamente para evitar múltiples disparos por rebuild
       _lastPaymentType = currentType;
 
@@ -79,17 +84,28 @@ class _BodyCartState extends State<BodyCart> {
         if (!mounted) return;
 
         // Configuración del popup según el método seleccionado
-        final String titleText =
-            isCash ? 'Pago en efectivo' : 'Pago con tarjeta';
-        final IconData titleIcon =
-            isCash ? Icons.payments_outlined : Icons.credit_card;
+        final String titleText = isCash
+            ? 'Pago en efectivo'
+            : isCard
+                ? 'Pago con tarjeta'
+                : 'Pago por transferencia';
+        final IconData titleIcon = isCash
+            ? Icons.payments_outlined
+            : isCard
+                ? Icons.credit_card
+                : Icons.account_balance;
         final String contentText = isCash
             ? 'Aceptamos billetes de hasta \$20. Si es posible, paga con el valor exacto.\n\n'
                 'Recuerda cancelar al motorizado el total del pedido, incluido el servicio de entrega.'
-            : 'Para pagar con tarjeta necesitas la app PayPhone.\n\n'
-                '1) Descárgala desde App Store o Google Play.\n'
-                '2) Registra tu tarjeta de crédito o débito (Visa, Mastercard o Diners).\n'
-                '3) Vuelve a AmaguExpress y presiona “Pagar” para generar el cobro en PayPhone.';
+            : isCard
+                ? 'Para pagar con tarjeta necesitas la app PayPhone.\n\n'
+                    '1) Descárgala desde App Store o Google Play.\n'
+                    '2) Registra tu tarjeta de crédito o débito (Visa, Mastercard o Diners).\n'
+                    '3) Vuelve a AmaguExpress y presiona “Pagar” para generar el cobro en PayPhone.'
+                : '1) Realiza la transferencia a la cuenta que se mostrará en pantalla.\n'
+                    '2) Envía el comprobante al WhatsApp 0998197655.\n'
+                    '3) La app esperará la acreditación del saldo; cuando el saldo se acredite, se generará la orden automáticamente.\n\n'
+                    'Solo transferencias de Banco Pichincha → Banco Pichincha.';
 
         showDialog<void>(
           context: context,
@@ -206,6 +222,22 @@ class _BodyCartState extends State<BodyCart> {
           },
         );
 
+      case TypesPayment.transfer:
+        return PrimaryButton(
+          color: Theme.of(context).colorScheme.primary,
+          text:
+              "${S.of(context).bPay} ${total.toStringAsFixed(kCoinDecimals)} $kCoin",
+          icon: Icons.account_balance_outlined,
+          onPressed: () {
+            _onPressedBuy(
+              context,
+              paymentController,
+              cartSummaryController,
+              total,
+            );
+          },
+        );
+
       default:
         return PrimaryButton(
           color: Theme.of(context).colorScheme.primary,
@@ -231,6 +263,41 @@ class _BodyCartState extends State<BodyCart> {
   ) async {
     if (cartSummaryController.products.isEmpty) return;
 
+    final iconCartController =
+        Provider.of<IconCartController>(context, listen: false);
+    final tabManController =
+        Provider.of<TabManController>(context, listen: false);
+    final tab1Controller = Provider.of<Tab1Controller>(context, listen: false);
+    final tab2Controller = Provider.of<Tab2Controller>(context, listen: false);
+    final addressDropdownController =
+        Provider.of<AddressDropdownController>(context, listen: false);
+
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final s = S.of(context);
+
+    if (paymentController.payment.type == TypesPayment.transfer) {
+      final confirmed = await Navigator.push<bool>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const TransferScreen(),
+        ),
+      );
+
+      if (confirmed == true) {
+        navigator.popUntil((route) => route.isFirst);
+        tabManController.currentScreen = 1;
+
+        tab1Controller.load();
+        tab2Controller.loadOrders();
+        iconCartController.count();
+
+        paymentController.isPaymentSelected = false;
+      }
+
+      return;
+    }
+
     if (paymentController.payment.type == TypesPayment.cash && total <= 0) {
       return;
     }
@@ -253,19 +320,6 @@ class _BodyCartState extends State<BodyCart> {
     }
 
     paymentController.isPaymentSelected = false;
-
-    final iconCartController =
-        Provider.of<IconCartController>(context, listen: false);
-    final tabManController =
-        Provider.of<TabManController>(context, listen: false);
-    final tab1Controller = Provider.of<Tab1Controller>(context, listen: false);
-    final tab2Controller = Provider.of<Tab2Controller>(context, listen: false);
-    final addressDropdownController =
-        Provider.of<AddressDropdownController>(context, listen: false);
-
-    final navigator = Navigator.of(context);
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final s = S.of(context);
 
     AddressModel? address = await DBProvider.db.loadAddress();
 
