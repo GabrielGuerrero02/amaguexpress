@@ -96,13 +96,13 @@ class RequestController extends ChangeNotifier {
   }
 
   addMarkertStore() async {
-    final icon = await toBytes('assets/restaurant.png', 170, isLocal: true);
+    final icon = await toBytes('assets/restaurant.png', 44, isLocal: true);
     addMarker(markerIdStore, icon,
         LatLng(request.store.location.x, request.store.location.y));
   }
 
   addMarkertClient() async {
-    final icon = await toBytes('assets/home.png', 150, isLocal: true);
+    final icon = await toBytes('assets/home.png', 38, isLocal: true);
     addMarker(
         markerIdClient, icon, LatLng(request.location.x, request.location.y));
   }

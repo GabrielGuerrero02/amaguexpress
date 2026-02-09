@@ -32,7 +32,11 @@ class SigninButton extends StatelessWidget {
         final s = S.of(context);
 
         UserModel? userLogin = await accessController.signin();
+
         if (userLogin != null) {
+          // ✅ Login OK: reset counter
+          accessController.resetFailedSigninAttempts();
+
           MaterialPageRoute route;
           if (userLogin.roles.contains(TypesRol.deliveryman)) {
             route = MaterialPageRoute(
@@ -48,16 +52,88 @@ class SigninButton extends StatelessWidget {
             return false;
           });
         } else {
+          // ❌ Login fail: increment counter
+          final attempts = accessController.registerFailedSigninAttempt();
+
+          scaffoldMessenger.clearSnackBars();
+
           scaffoldMessenger.showSnackBar(SnackBar(
             duration: const Duration(milliseconds: 4500),
-            content: Text(s.mIncorrectLogin),
+            content: Text('${s.mIncorrectLogin} ($attempts/5)'),
             action: SnackBarAction(
               label: s.bRecoverAccount,
               textColor: Colors.red,
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => RecoverScreen())),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => RecoverScreen()),
+              ),
             ),
           ));
+
+          // ✅ At 5 attempts: show blocking dialog and send to recover
+          if (attempts >= 5) {
+            await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => AlertDialog(
+                backgroundColor: Colors.grey.shade50,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  side: const BorderSide(color: Colors.black87, width: 1.2),
+                ),
+                titlePadding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                contentPadding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
+                actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                title: const Text(
+                  'CUENTA BLOQUEADA',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 54, 0, 0),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                content: const Text(
+                  'Has excedido el número de intentos. Recupera tu cuenta para continuar.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, height: 1.25),
+                ),
+                actions: [
+                  Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 18,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => RecoverScreen()),
+                        );
+                      },
+                      child: const Text(
+                        'Recuperar cuenta',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+
+            // UI only: reset after lock message
+            accessController.resetFailedSigninAttempts();
+          }
         }
       },
     );

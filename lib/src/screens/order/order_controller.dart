@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart' show ChangeNotifier;
 import 'package:geolocator/geolocator.dart';
@@ -104,13 +105,21 @@ class OrderController extends ChangeNotifier {
   onMapCreated(GoogleMapController controller) async {
     _completer = Completer();
     _completer.complete(controller);
+
+    // Ensure base markers are always loaded for the client view.
+    // (Store/Deliveryman screens may call this elsewhere, but the client needs it here.)
+    await addMarkers();
+
+    // If the order is already assigned/taken, start listening for deliveryman updates.
+    await onListenerPositions();
   }
 
   onListenerPositions() async {
     _socketBloc.close();
     if (order.status == StatusOrder.assigned ||
         order.status == StatusOrder.taken) {
-      addMarkertDeliveryMan(0, 0);
+      // Start the deliveryman marker near the store so it is visible until the first real position arrives.
+      addMarkertDeliveryMan(order.start.x, order.start.y);
       _socketBloc.connect(order.deliveryman!.id);
       _socketBloc.stream.listen((position) {
         updateLocationDeliveryMan(position);
@@ -119,26 +128,30 @@ class OrderController extends ChangeNotifier {
   }
 
   addMarkertStore() async {
-    final String urtlImage = order.store.company.marker.length <= 5
-        ? kImageCategoryAll
-        : order.store.company.marker;
-    final icon = await toBytes(urtlImage, 130, isLocal: false);
+    // Use the same store icon as other roles (local asset), to keep a consistent UI
+    // and avoid remote logo images that can look distorted on the map.
+    final icon = await toBytes('assets/restaurant.png', 44, isLocal: true);
     addMarker(markerIdStore, icon, LatLng(order.start.x, order.start.y));
   }
 
   addMarkertClient() async {
-    final icon = await toBytes('assets/home.png', 160, isLocal: true);
+    final icon = await toBytes('assets/home.png', 38, isLocal: true);
     addMarker(markerIdClient, icon, LatLng(order.location.x, order.location.y));
   }
 
   addMarkertDeliveryMan(double lt, double lg) async {
-    final icon = await toBytes('assets/car.png', 110, isLocal: true);
+    final icon = await toBytes('assets/car.png', 36, isLocal: true);
     iconDeliveryMan = icon;
     addMarker(markerIdDeliveryMan, icon, LatLng(lt, lg));
   }
 
   addMarker(MarkerId markerId, BitmapDescriptor icon, LatLng position) {
-    final market = Marker(markerId: markerId, icon: icon, position: position);
+    final market = Marker(
+      markerId: markerId,
+      icon: icon,
+      position: position,
+      anchor: const ui.Offset(0.5, 0.9),
+    );
     _markers[markerId] = market;
   }
 

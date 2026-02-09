@@ -15,6 +15,34 @@ ThemeData lightThemeData(BuildContext context) {
       secondary: kSecondaryColor,
       error: kErrorColor,
     ),
+    // Inputs: borde naranja en focus también en tema claro
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: Colors.white,
+      hintStyle: const TextStyle(color: Color(0xFF757575)),
+      labelStyle: const TextStyle(color: Color(0xFF616161)),
+      floatingLabelStyle: const TextStyle(color: kPrimaryColor),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: kPrimaryColor, width: 1.6),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: kErrorColor),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: kErrorColor, width: 1.6),
+      ),
+    ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
       selectedItemColor: kContentColorLightTheme.withValues(alpha: (0.7 * 255)),
@@ -36,14 +64,17 @@ ThemeData darkThemeData(BuildContext context) {
     // AppBar con buen contraste
     appBarTheme: appBarTheme.copyWith(
       backgroundColor: const Color(0xFF1E1E1E),
-      foregroundColor: const Color.fromARGB(255, 48, 48, 48),
+      foregroundColor: const Color(0xFFE0E0E0),
       elevation: 0,
     ),
     // Íconos claros sobre fondo oscuro
     iconTheme: const IconThemeData(color: Color(0xFFE0E0E0)),
     // Tipografías legibles en oscuro
     textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme).apply(
-        bodyColor: const Color.fromARGB(255, 97, 97, 97), fontSizeFactor: 0.8),
+      bodyColor: const Color(0xFFE0E0E0),
+      displayColor: const Color(0xFFE0E0E0),
+      fontSizeFactor: 0.8,
+    ),
     // Esquema de colores coherente en oscuro
     colorScheme: base.colorScheme.copyWith(
       primary: kPrimaryColor,
@@ -53,6 +84,36 @@ ThemeData darkThemeData(BuildContext context) {
       background: const Color(0xFF121212),
       onSurface: const Color(0xFFE0E0E0),
       onPrimary: Colors.white,
+    ),
+    // Inputs: fondo oscuro (relleno) y bordes coherentes para que el texto blanco sea legible
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: const Color(0xFF1F1F1F),
+      hintStyle: const TextStyle(color: Color(0xFFB0B0B0)),
+      labelStyle: const TextStyle(color: Color(0xFFB0B0B0)),
+      floatingLabelStyle: const TextStyle(color: Color(0xFFE0E0E0)),
+      prefixStyle: const TextStyle(color: Color(0xFFE0E0E0)),
+      suffixStyle: const TextStyle(color: Color(0xFFE0E0E0)),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: kPrimaryColor, width: 1.6),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: kErrorColor),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: kErrorColor, width: 1.6),
+      ),
     ),
     // Tarjetas/paneles con superficie más clara que el fondo
     cardColor: const Color(0xFF1E1E1E),

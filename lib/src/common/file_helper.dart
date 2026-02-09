@@ -1,15 +1,38 @@
-import 'dart:async';
 import 'dart:io' as io;
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
-import 'package:image/image.dart' as img; // Añade esto en pubspec.yaml también
+
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image/image.dart' as img;
 
-toBytes(String path, int targetWidth, {required isLocal}) async {
+// In-memory cache for marker bitmaps.
+Map<String, BitmapDescriptor> _markerCache = <String, BitmapDescriptor>{};
+
+/// Builds a Google Maps marker icon from an asset (local) or URL (remote),
+/// resizing it to a consistent on-screen size.
+///
+/// - [targetWidth] is in logical pixels (dp). Internally we multiply by the
+///   device pixel ratio to avoid huge icons on high-density screens.
+/// - Uses an in-memory cache to avoid decoding the same icon repeatedly.
+Future<BitmapDescriptor> toBytes(
+  String path,
+  int targetWidth, {
+  required bool isLocal,
+  int? targetHeight,
+}) async {
+  final dpr = (window.devicePixelRatio == 0) ? 1.0 : window.devicePixelRatio;
+  final wPx = (targetWidth * dpr).round();
+  final hPx = targetHeight != null ? (targetHeight * dpr).round() : null;
+
+  final cacheKey = '${isLocal ? 'L' : 'R'}|$path|$wPx|${hPx ?? '-'}';
+  final cached = _markerCache[cacheKey];
+  if (cached != null) return cached;
+
   Uint8List bytes;
   if (isLocal) {
     final ByteData data = await rootBundle.load(path);
@@ -18,19 +41,27 @@ toBytes(String path, int targetWidth, {required isLocal}) async {
     final file = await DefaultCacheManager().getSingleFile(path);
     bytes = await file.readAsBytes();
   }
-  final codec = await instantiateImageCodec(bytes, targetWidth: targetWidth);
+
+  final codec = await instantiateImageCodec(
+    bytes,
+    targetWidth: wPx,
+    targetHeight: hPx,
+  );
   final frameInfo = await codec.getNextFrame();
-  final image = await frameInfo.image.toByteData(format: ImageByteFormat.png);
+  final imageData =
+      await frameInfo.image.toByteData(format: ImageByteFormat.png);
+  final descriptor = BitmapDescriptor.bytes(imageData!.buffer.asUint8List());
 
-  final bitmap = BitmapDescriptor.bytes(image!.buffer.asUint8List());
-  final icon = Completer<BitmapDescriptor>();
-  icon.complete(bitmap);
-
-  return await icon.future;
+  _markerCache[cacheKey] = descriptor;
+  return descriptor;
 }
 
 Future<String> uploadFile(
-    io.File file, String folder, String name, int targetWidth) async {
+  io.File file,
+  String folder,
+  String name,
+  int targetWidth,
+) async {
   firebase_storage.Reference storageReference =
       firebase_storage.FirebaseStorage.instance.ref(folder).child(name);
 
@@ -46,8 +77,13 @@ Future<String> uploadFile(
           decoded.width < decoded.height ? decoded.width : decoded.height;
       final offsetX = ((decoded.width - minSide) / 2).round();
       final offsetY = ((decoded.height - minSide) / 2).round();
-      final cropped = img.copyCrop(decoded,
-          x: offsetX, y: offsetY, width: minSide, height: minSide);
+      final cropped = img.copyCrop(
+        decoded,
+        x: offsetX,
+        y: offsetY,
+        width: minSide,
+        height: minSide,
+      );
 
       // Redimensionamos a targetWidth
       final resized =
@@ -71,6 +107,7 @@ Future<String> uploadFile(
     }
   } catch (e) {
     if (kDebugMode) {
+      // ignore: avoid_print
       print(e);
     }
     return '';

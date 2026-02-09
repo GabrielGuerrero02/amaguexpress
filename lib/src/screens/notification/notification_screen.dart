@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:amaguexpress/generated/l10n.dart';
 import 'package:amaguexpress/src/models/notification_model.dart';
 import 'package:amaguexpress/src/screens/notification/widget/list_notifications.dart';
+import 'package:amaguexpress/constants/constants.dart';
 
 class NotificacionPage extends StatefulWidget {
   const NotificacionPage({super.key});
@@ -46,8 +47,10 @@ class _NotificacionPageState extends State<NotificacionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          AppBar(centerTitle: true, title: Text(S.of(context).tNotifications)),
+      appBar: AppBar(
+          backgroundColor: kPrimaryColor,
+          centerTitle: true,
+          title: Text(S.of(context).tNotifications)),
       body: Center(
         child: Column(
           children: <Widget>[

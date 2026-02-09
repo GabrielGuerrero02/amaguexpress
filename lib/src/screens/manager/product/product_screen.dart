@@ -24,7 +24,9 @@ class ProductScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final productController = Provider.of<ProductController>(context);
     return Scaffold(
-      appBar: AppBar(title: Text(productsController.storeCompany.name)),
+      appBar: AppBar(
+          backgroundColor: kPrimaryColor,
+          title: Text(productsController.storeCompany.name)),
       body: ModalProgressHUD(
         inAsyncCall: productController.inAsyncCall,
         child: Form(

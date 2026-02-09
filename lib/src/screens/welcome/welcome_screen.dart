@@ -27,7 +27,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: kDefaultPadding * 3),
-            const Image(image: AssetImage('assets/screen/welcome.png')),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Image(
+                image: AssetImage(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? 'assets/screen/welcome_dark.png'
+                      : 'assets/screen/welcome.png',
+                ),
+              ),
+            ),
             const SizedBox(height: 50),
             Text(S.of(context).tWelcome,
                 style: const TextStyle(fontSize: 18),

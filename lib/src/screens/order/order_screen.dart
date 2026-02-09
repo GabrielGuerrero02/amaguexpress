@@ -15,8 +15,18 @@ class OrderScreen extends StatelessWidget {
     return ChangeNotifierProvider<OrderController>.value(
       value: OrderController(order),
       child: Scaffold(
-        appBar: AppBar(title: Text(order.store.name)),
-        backgroundColor: kPrimaryColor, // Usa tu color primario
+        appBar: AppBar(
+          backgroundColor: kPrimaryColor,
+          foregroundColor: Colors.white,
+          iconTheme: const IconThemeData(color: Colors.white),
+          centerTitle: true,
+          titleTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+          title: Text(order.store.name),
+        ),
         body: Consumer<OrderController>(
             builder: (context, orderController, child) =>
                 ContentOrder(orderController)),

@@ -120,7 +120,7 @@ class TaxiController extends ChangeNotifier {
       const MarkerId('markerIdPickupLocation');
 
   addMarkertPickupLocation(Location location) async {
-    final icon = await toBytes('assets/exit.png', 290, isLocal: true);
+    final icon = await toBytes('assets/exit.png', 48, isLocal: true);
     addMarker(markerIdPickupLocation, icon, LatLng(location.x, location.y));
   }
 
@@ -128,7 +128,7 @@ class TaxiController extends ChangeNotifier {
       const MarkerId('markerIdDetinationLocation');
 
   addMarkertDetinationLocation(Location location) async {
-    final icon = await toBytes('assets/start.png', 200, isLocal: true);
+    final icon = await toBytes('assets/start.png', 44, isLocal: true);
     addMarker(markerIdDetinationLocation, icon, LatLng(location.x, location.y));
   }
 

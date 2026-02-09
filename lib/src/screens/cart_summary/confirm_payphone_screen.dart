@@ -5,6 +5,7 @@ import 'package:amaguexpress/src/screens/main/tab1_controller.dart';
 import 'package:amaguexpress/src/screens/main/tab2_controller.dart';
 import 'package:amaguexpress/src/screens/main/tab_main_controller.dart';
 import 'package:amaguexpress/src/widgets/icon_cart/icon_cart_controller.dart';
+import 'package:amaguexpress/constants/constants.dart';
 
 class ConfirmPayPhoneScreen extends StatefulWidget {
   final String transactionId;
@@ -84,7 +85,9 @@ class _ConfirmPayPhoneScreenState extends State<ConfirmPayPhoneScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Confirmación de pago')),
+      appBar: AppBar(
+          backgroundColor: kPrimaryColor,
+          title: const Text('Confirmación de pago')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),

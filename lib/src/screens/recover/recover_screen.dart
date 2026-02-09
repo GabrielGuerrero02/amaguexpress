@@ -25,29 +25,48 @@ class RecoverScreen extends StatelessWidget {
         child: Consumer<RecoverController>(
           builder: (context, recoverController, child) => ModalProgressHUD(
             inAsyncCall: recoverController.inAsyncCall,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Form(
-                  key: formKey,
-                  child: Expanded(
-                      child: Container(
-                    padding: const EdgeInsets.all(kDefaultPadding),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Image.asset('assets/screen/recover.png', width: 380),
-                          const SizedBox(height: kDefaultPadding),
-                          EmailInput(recoverController),
-                          const SizedBox(height: kDefaultPadding * 2),
-                        ],
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      kDefaultPadding,
+                      kDefaultPadding,
+                      kDefaultPadding,
+                      kDefaultPadding + bottomInset,
+                    ),
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Form(
+                              key: formKey,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset('assets/screen/recover.png',
+                                      width: 380),
+                                  const SizedBox(height: kDefaultPadding),
+                                  EmailInput(recoverController),
+                                  const SizedBox(height: kDefaultPadding * 2),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: kDefaultPadding),
+                            RecoverButton(recoverController, formKey: formKey),
+                          ],
+                        ),
                       ),
                     ),
-                  )),
-                ),
-                RecoverButton(recoverController, formKey: formKey)
-              ],
+                  );
+                },
+              ),
             ),
           ),
         ),

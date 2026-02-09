@@ -96,12 +96,12 @@ class PetitionController extends ChangeNotifier {
   }
 
   addMarkertStore() async {
-    final icon = await toBytes('assets/restaurant.png', 170, isLocal: true);
+    final icon = await toBytes('assets/restaurant.png', 44, isLocal: true);
     addMarker(markerIdStore, icon, LatLng(petition.start.x, petition.start.y));
   }
 
   addMarkertClient() async {
-    final icon = await toBytes('assets/home.png', 150, isLocal: true);
+    final icon = await toBytes('assets/home.png', 38, isLocal: true);
     addMarker(
         markerIdClient, icon, LatLng(petition.location.x, petition.location.y));
   }

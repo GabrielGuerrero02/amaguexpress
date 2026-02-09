@@ -16,7 +16,9 @@ class PasswordInput extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding * 0.75),
       margin: const EdgeInsets.symmetric(horizontal: kDefaultPadding * 0.5),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1F1F1F)
+            : const Color.fromARGB(255, 255, 255, 255),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: Colors.black, // Borde negro

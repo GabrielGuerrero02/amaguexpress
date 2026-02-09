@@ -10,6 +10,7 @@ import 'package:amaguexpress/src/screens/deliveryman/petition/widget/floating_bu
 import 'package:amaguexpress/src/screens/deliveryman/petition/widget/floating_head.dart';
 import 'package:amaguexpress/src/screens/deliveryman/petition/widget/floating_sheet_bottom.dart';
 import 'package:amaguexpress/src/widgets/modal_progress_hud.dart';
+import 'package:amaguexpress/constants/constants.dart';
 
 class ContentPetition extends StatefulWidget {
   const ContentPetition(
@@ -62,7 +63,9 @@ class _ContentPetitionState extends State<ContentPetition>
     return ModalProgressHUD(
       inAsyncCall: widget.petitionController.inAsyncCall,
       child: Scaffold(
-        appBar: AppBar(actions: [_buttonAppBar(widget.petitionController)]),
+        appBar: AppBar(
+            backgroundColor: kPrimaryColor,
+            actions: [_buttonAppBar(widget.petitionController)]),
         body: Stack(
           children: [
             GoogleMap(

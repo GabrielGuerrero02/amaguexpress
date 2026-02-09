@@ -15,6 +15,19 @@ class AccessController with ChangeNotifier {
   String _phone = '';
   bool _inAsyncCall = false;
 
+  // === Failed sign-in attempts (UI only) ===
+  int _failedSigninAttempts = 0;
+  int get failedSigninAttempts => _failedSigninAttempts;
+
+  void resetFailedSigninAttempts() {
+    _failedSigninAttempts = 0;
+  }
+
+  int registerFailedSigninAttempt() {
+    _failedSigninAttempts += 1;
+    return _failedSigninAttempts;
+  }
+
   String get email => _email;
 
   set email(String email) {

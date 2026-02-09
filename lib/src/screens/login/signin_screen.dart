@@ -49,9 +49,11 @@ class SigninScreen extends StatelessWidget {
                           child: Text(S.of(context).bRecoverAccount),
                           onPressed: () async {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => RecoverScreen()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => RecoverScreen(),
+                              ),
+                            );
                           },
                         ),
                         const SizedBox(height: kDefaultPadding * 7),
