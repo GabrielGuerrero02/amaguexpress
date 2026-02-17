@@ -19,6 +19,8 @@ class FloatingSheetBottom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return DraggableScrollableSheet(
       initialChildSize: 0.3,
       minChildSize: 0.3,
@@ -27,15 +29,22 @@ class FloatingSheetBottom extends StatelessWidget {
       snapSizes: const [0.7, 1],
       builder: (context, scrollController) => Container(
         padding: const EdgeInsets.only(top: 0, right: 10, left: 10, bottom: 10),
-        color: Colors.white,
+        color: isDark ? cs.surface : Colors.white,
         child: SingleChildScrollView(
           controller: scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Center(
-                  child: SizedBox(width: 60, child: Divider(thickness: 5))),
+              Center(
+                child: SizedBox(
+                  width: 60,
+                  child: Divider(
+                    thickness: 5,
+                    color: isDark ? Colors.white24 : Colors.black26,
+                  ),
+                ),
+              ),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -45,7 +54,51 @@ class FloatingSheetBottom extends StatelessWidget {
                     child: orderController.order.status >=
                                 StatusOrder.assigned &&
                             orderController.order.status <= StatusOrder.taken
-                        ? IconChat(orderController)
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 0,
+                              horizontal: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? cs.surfaceContainerHighest
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: kPrimaryColor.withOpacity(
+                                  isDark ? 0.35 : 0.25,
+                                ),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black
+                                      .withOpacity(isDark ? 0.35 : 0.12),
+                                  blurRadius: 14,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconChat(orderController),
+                                const SizedBox(height: 2),
+                                Text(
+                                  orderController.order.deliveryman?.fullName ??
+                                      S.of(context).lDeliveryman,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: cs.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
                         : Container(),
                   ),
                   SizedBox(
@@ -74,7 +127,9 @@ class FloatingSheetBottom extends StatelessWidget {
                   Expanded(child: Container()),
                   Expanded(child: Container()),
                   Text(
-                      '${S.of(context).lTotal} ${orderController.order.total.toStringAsFixed(kCoinDecimals)} $kCoin'),
+                    '${S.of(context).lTotal} ${orderController.order.total.toStringAsFixed(kCoinDecimals)} $kCoin',
+                    style: TextStyle(color: cs.onSurface),
+                  ),
                   const SizedBox(width: 10)
                 ],
               ),

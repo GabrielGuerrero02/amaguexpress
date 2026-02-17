@@ -4,6 +4,7 @@ import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/src/common/launch.dart';
 import 'package:amaguexpress/src/models/petition_model.dart';
 import 'package:amaguexpress/src/widgets/circular_button.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class FloatingButtonWhatsapp extends StatelessWidget {
   const FloatingButtonWhatsapp({
@@ -20,11 +21,22 @@ class FloatingButtonWhatsapp extends StatelessWidget {
             top: 120,
             right: kDefaultPadding,
             child: CircularButton(
-              icon: const Icon(Icons.chat_bubble_outline,
-                  color: kPrimaryColor, size: 40),
+              icon: const SizedBox(
+                width: 44,
+                height: 44,
+                child: Center(
+                  child: FaIcon(
+                    FontAwesomeIcons.whatsapp,
+                    color: kPrimaryColor,
+                    size: 34,
+                  ),
+                ),
+              ),
               onPressed: () {
-                sendWhatsapp(petition.store.contact,
-                    '${petition.user.fullName}\n${petition.products.join('\n')}');
+                sendWhatsapp(
+                  petition.store.contact,
+                  '${petition.user.fullName}\n${petition.products.join('\n')}',
+                );
               },
             ),
           )

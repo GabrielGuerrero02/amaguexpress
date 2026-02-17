@@ -157,8 +157,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "lNewAddress": MessageLookupByLibrary.simpleMessage("Nueva dirección"),
         "lNumber": MessageLookupByLibrary.simpleMessage("Cantidad"),
         "lOrderBy": MessageLookupByLibrary.simpleMessage("Orden a cargo de"),
-        "lPayCash": MessageLookupByLibrary.simpleMessage("Pagar en efectivo"),
-        "lPayMoney": MessageLookupByLibrary.simpleMessage("Pagar con tarjeta"),
+        "lPayCash": MessageLookupByLibrary.simpleMessage("Efectivo"),
+        "lPayMoney": MessageLookupByLibrary.simpleMessage("Tarjeta"),
         "lPaymentMethods":
             MessageLookupByLibrary.simpleMessage("Métodos de pago"),
         "lPrice": MessageLookupByLibrary.simpleMessage("Precio"),
@@ -192,7 +192,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "💚 El conductor ha informado de que ha subido al vehículo"),
         "lSunday": MessageLookupByLibrary.simpleMessage("Domingo"),
         "lTMoneyValid": MessageLookupByLibrary.simpleMessage(
-            "Money. Válido sólo con tarjeta de crédito"),
+            "Saldo: Válido con tarjeta de crédito y transferencia"),
         "lThursday": MessageLookupByLibrary.simpleMessage("Jueves"),
         "lTotal": MessageLookupByLibrary.simpleMessage("Total"),
         "lTuesday": MessageLookupByLibrary.simpleMessage("Martes"),

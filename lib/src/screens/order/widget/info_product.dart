@@ -13,14 +13,37 @@ class InfoProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: order.products.length,
       itemBuilder: (context, index) => ListTile(
+        tileColor: isDark ? cs.surface : null,
+        textColor: cs.onSurface,
+        iconColor: cs.onSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: kPrimaryColor.withOpacity(isDark ? 0.18 : 0.0),
+            width: 1,
+          ),
+        ),
         title: Text(
-            '(${order.products[index].number}) ${order.products[index].name} ${order.products[index].total.toStringAsFixed(kCoinDecimals)}'),
-        subtitle: Text(order.products[index].description),
+          '(${order.products[index].number}) ${order.products[index].name} ${order.products[index].total.toStringAsFixed(kCoinDecimals)}',
+          style: TextStyle(
+            color: cs.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          order.products[index].description,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: cs.onSurfaceVariant),
+        ),
         trailing: AvatarImage(image: order.products[index].image),
       ),
     );

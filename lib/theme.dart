@@ -12,15 +12,15 @@ ThemeData lightThemeData(BuildContext context) {
         .apply(bodyColor: kContentColorLightTheme, fontSizeFactor: 0.8),
     colorScheme: const ColorScheme.light(
       primary: kPrimaryColor,
-      secondary: kSecondaryColor,
+      secondary: Color.fromARGB(255, 36, 32, 32),
       error: kErrorColor,
     ),
     // Inputs: borde naranja en focus también en tema claro
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
-      hintStyle: const TextStyle(color: Color(0xFF757575)),
-      labelStyle: const TextStyle(color: Color(0xFF616161)),
+      hintStyle: const TextStyle(color: Color.fromARGB(255, 170, 169, 169)),
+      labelStyle: const TextStyle(color: Color.fromARGB(255, 147, 146, 146)),
       floatingLabelStyle: const TextStyle(color: kPrimaryColor),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -78,7 +78,7 @@ ThemeData darkThemeData(BuildContext context) {
     // Esquema de colores coherente en oscuro
     colorScheme: base.colorScheme.copyWith(
       primary: kPrimaryColor,
-      secondary: kSecondaryColor,
+      secondary: const Color.fromARGB(255, 45, 41, 41),
       error: const Color.fromARGB(255, 202, 106, 106),
       surface: const Color(0xFF1E1E1E),
       background: const Color(0xFF121212),
@@ -121,7 +121,7 @@ ThemeData darkThemeData(BuildContext context) {
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Color(0xFF1E1E1E),
       selectedItemColor: kPrimaryColor,
-      unselectedItemColor: Color(0xFF9E9E9E),
+      unselectedItemColor: Color.fromARGB(255, 180, 178, 178),
       selectedIconTheme: IconThemeData(color: kPrimaryColor),
       showUnselectedLabels: true,
     ),

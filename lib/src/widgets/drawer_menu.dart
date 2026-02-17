@@ -136,11 +136,17 @@ class Header extends StatelessWidget {
                     textScaler: const TextScaler.linear(1.4),
                     overflow: TextOverflow.visible)),
             SizedBox(
-                child: Text(pref.user.email,
-                    textScaler: const TextScaler.linear(0.9),
-                    softWrap: false,
-                    overflow: TextOverflow.visible,
-                    style: const TextStyle(color: kSecondaryColor))),
+                child: Text(
+              pref.user.email,
+              textScaler: const TextScaler.linear(0.9),
+              softWrap: false,
+              overflow: TextOverflow.visible,
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFFB7BFCC)
+                    : kSecondaryColor,
+              ),
+            )),
           ],
         )
       ],

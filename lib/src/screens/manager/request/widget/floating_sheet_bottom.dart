@@ -13,6 +13,8 @@ class FloatingSheetBottom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
       minChildSize: 0.2,
@@ -21,25 +23,52 @@ class FloatingSheetBottom extends StatelessWidget {
       snapSizes: const [0.4, 0.85, 1],
       builder: (context, scrollController) => Container(
         padding: const EdgeInsets.only(top: 0, right: 10, left: 10, bottom: 10),
-        color: Colors.white,
+        color: isDark ? cs.surface : Colors.white,
         child: SingleChildScrollView(
           controller: scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Center(
-                  child: SizedBox(width: 60, child: Divider(thickness: 5))),
+              Center(
+                child: SizedBox(
+                  width: 60,
+                  child: Divider(
+                    thickness: 5,
+                    color: isDark ? Colors.white24 : Colors.black26,
+                  ),
+                ),
+              ),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  SizedBox(
-                    height: 70,
-                    child: ClipOval(
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: isDark ? cs.surfaceContainerHighest : Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: kPrimaryColor.withOpacity(isDark ? 0.35 : 0.22),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(isDark ? 0.35 : 0.12),
+                          blurRadius: 14,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: SizedBox(
+                      height: 58,
+                      width: 58,
+                      child: ClipOval(
                         child: AvatarImage(
-                            image:
-                                requestController.request.store.company.image)),
+                          image: requestController.request.store.company.image,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -60,7 +89,9 @@ class FloatingSheetBottom extends StatelessWidget {
                   Expanded(child: Container()),
                   Expanded(child: Container()),
                   Text(
-                      '${S.of(context).lTotal} ${requestController.request.total.toStringAsFixed(kCoinDecimals)} $kCoin'),
+                    '${S.of(context).lTotal} ${requestController.request.total.toStringAsFixed(kCoinDecimals)} $kCoin',
+                    style: TextStyle(color: cs.onSurface),
+                  ),
                   const SizedBox(width: 10)
                 ],
               ),

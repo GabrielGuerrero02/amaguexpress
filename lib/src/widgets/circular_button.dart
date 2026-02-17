@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 class CircularButton extends StatelessWidget {
-  const CircularButton({super.key, required this.onPressed, required this.icon})
-      ;
+  const CircularButton({
+    super.key,
+    required this.onPressed,
+    required this.icon,
+  });
 
-  final Function onPressed;
-  final Icon icon;
+  final VoidCallback onPressed;
+  final Widget icon;
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ class SecondaryButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.color = kSecondaryColor,
+    this.color = const Color.fromARGB(255, 77, 81, 87),
     this.padding = const EdgeInsets.all(kDefaultPadding * 0.85),
   });
 
@@ -21,11 +21,17 @@ class SecondaryButton extends StatelessWidget {
       padding: const EdgeInsets.all(kDefaultPadding * .5),
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-            shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(40))),
-            side: const BorderSide(color: kSecondaryColor),
-            padding: const EdgeInsets.only(
-                top: kDefaultPadding * .9, bottom: kDefaultPadding * .9)),
+          backgroundColor: color,
+          foregroundColor: kPrimaryColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(40)),
+          ),
+          side: const BorderSide(color: kPrimaryColor),
+          padding: const EdgeInsets.only(
+            top: kDefaultPadding * .9,
+            bottom: kDefaultPadding * .9,
+          ),
+        ),
         onPressed: onPressed,
         child: Row(
           mainAxisSize: MainAxisSize.max,
@@ -35,7 +41,7 @@ class SecondaryButton extends StatelessWidget {
             Text(
               text,
               style: const TextStyle(
-                color: kSecondaryColor,
+                color: kPrimaryColor,
               ),
             )
           ],

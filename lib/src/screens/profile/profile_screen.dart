@@ -36,24 +36,25 @@ class ProfileScreen extends StatelessWidget {
         builder: (context, profileController, child) => Scaffold(
           resizeToAvoidBottomInset: true,
           appBar: AppBar(
-            backgroundColor: kPrimaryColor, // Usa tu color primario
+            backgroundColor: kPrimaryColor,
             title: Text(pref.user.fullName),
             actions: [
               IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => ConfirmationDialog(
-                        S.of(context).mDLogoutSession,
-                        labelOk: S.of(context).bAccept,
-                        iconOk: const Icon(Icons.output_outlined),
-                        onPressedOk: () {
-                          _logOut(context, profileController);
-                        },
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.output_outlined, size: 30))
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => ConfirmationDialog(
+                      S.of(context).mDLogoutSession,
+                      labelOk: S.of(context).bAccept,
+                      iconOk: const Icon(Icons.output_outlined),
+                      onPressedOk: () {
+                        _logOut(context, profileController);
+                      },
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.output_outlined, size: 30),
+              )
             ],
           ),
           body: ModalProgressHUD(
@@ -64,14 +65,12 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Zona scrollable
                   Expanded(
                     child: SingleChildScrollView(
-                      padding: EdgeInsets.only(
+                      padding: const EdgeInsets.only(
                         left: kDefaultPadding,
                         right: kDefaultPadding,
                         top: kDefaultPadding * 1.3,
-                        // padding inferior considerando safe area
                         bottom: kDefaultPadding,
                       ),
                       child: Form(
@@ -88,10 +87,11 @@ class ProfileScreen extends StatelessWidget {
                                       UploadFile((image) async {
                                     profileController.inAsyncCall = true;
                                     String imageUpload = await uploadFile(
-                                        image,
-                                        'user/${pref.user.id}',
-                                        '${pref.user.id}-${DateTime.now().toIso8601String()}',
-                                        kTargetWidthUser);
+                                      image,
+                                      'user/${pref.user.id}',
+                                      '${pref.user.id}-${DateTime.now().toIso8601String()}',
+                                      kTargetWidthUser,
+                                    );
                                     profileController.changeImage(imageUpload);
                                   }),
                                 );
@@ -101,10 +101,11 @@ class ProfileScreen extends StatelessWidget {
                                 lineWidth: 3.0,
                                 percent: 1.0,
                                 center: AvatarImage(
-                                    width: 80,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(100)),
-                                    image: pref.user.image),
+                                  width: 80,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(100)),
+                                  image: pref.user.image,
+                                ),
                                 progressColor: kPrimaryColor,
                               ),
                             ),
@@ -119,7 +120,6 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Botón fijo al final, fuera del scrollbar
                   Padding(
                     padding: EdgeInsets.only(
                       left: kDefaultPadding,
@@ -188,9 +188,8 @@ class ProfileScreen extends StatelessWidget {
 
     pref.clean();
     navigator.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-        (Route<dynamic> route) {
-      return false;
-    });
+      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+      (Route<dynamic> route) => false,
+    );
   }
 }
