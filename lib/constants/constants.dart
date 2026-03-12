@@ -24,6 +24,9 @@ const kImageCategoryAll =
 const kSokect = 'https://api.amaguexpress.com';
 const kDomain = 'https://api.amaguexpress.com/api/';
 
+//const kSokect = 'https://34.58.159.85';
+//const kDomain = 'https://34.58.159.85/api/';
+
 const kCountryCode = 'EC';
 const kCoin = 'USD';
 const kCoinDecimals = 2;

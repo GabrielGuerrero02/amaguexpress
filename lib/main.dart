@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-//import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:amaguexpress/constants/constants.dart';
 import 'package:amaguexpress/constants/types_constant.dart';
 import 'package:amaguexpress/generated/l10n.dart';

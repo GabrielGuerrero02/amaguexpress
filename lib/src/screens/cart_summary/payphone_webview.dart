@@ -593,6 +593,8 @@ class _PayPhoneWebViewState extends State<PayPhoneWebView> {
   @override
   Widget build(BuildContext context) {
     final pillColor = _statusColor(statusText);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -622,13 +624,13 @@ class _PayPhoneWebViewState extends State<PayPhoneWebView> {
                 const Spacer(),
               ] else if (transactionId != null) ...[
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Solicitud enviada a PayPhone',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: Colors.black,
+                    color: cs.onBackground,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -636,16 +638,22 @@ class _PayPhoneWebViewState extends State<PayPhoneWebView> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF171A21) : Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFE6E6E6)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x11000000),
-                        blurRadius: 10,
-                        offset: Offset(0, 6),
-                      )
-                    ],
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF2A3140)
+                          : const Color(0xFFE6E6E6),
+                    ),
+                    boxShadow: isDark
+                        ? const []
+                        : const [
+                            BoxShadow(
+                              color: Color(0x11000000),
+                              blurRadius: 10,
+                              offset: Offset(0, 6),
+                            )
+                          ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -691,22 +699,31 @@ class _PayPhoneWebViewState extends State<PayPhoneWebView> {
                       const SizedBox(height: 10),
                       Text(
                         'Se envió el cobro a PayPhone con el número registrado: ${_maskPhoneForUi(widget.phoneNumber)}',
-                        style: const TextStyle(fontSize: 14),
+                        style: TextStyle(fontSize: 14, color: cs.onSurface),
                       ),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         'Pasos:',
-                        style: TextStyle(fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: cs.onSurface,
+                        ),
                       ),
                       const SizedBox(height: 6),
-                      const Text('1) Abre la app PayPhone.'),
-                      const Text('2) Aprueba el cobro pendiente.'),
-                      const Text(
-                          '3) Regresa aquí y presiona “Verificar pago”.'),
+                      Text('1) Abre la app PayPhone.',
+                          style: TextStyle(color: cs.onSurface)),
+                      Text('2) Aprueba el cobro pendiente.',
+                          style: TextStyle(color: cs.onSurface)),
+                      Text('3) Regresa aquí y presiona “Verificar pago”.',
+                          style: TextStyle(color: cs.onSurface)),
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         'Nota: Si aún no tienes PayPhone, instálala y registra tu tarjeta antes de continuar.',
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color:
+                              isDark ? const Color(0xFFB7BFCC) : Colors.black54,
+                        ),
                       ),
                     ],
                   ),
@@ -732,9 +749,12 @@ class _PayPhoneWebViewState extends State<PayPhoneWebView> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'El pago se rechazará en 5 minutos si no completas la transacción.',
-                  style: TextStyle(fontSize: 12, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? const Color(0xFFB7BFCC) : Colors.black87,
+                  ),
                 ),
                 const Spacer(),
                 SizedBox(
@@ -743,9 +763,13 @@ class _PayPhoneWebViewState extends State<PayPhoneWebView> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).maybePop(),
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor:
+                          isDark ? const Color(0xFF171A21) : Colors.black,
                       foregroundColor: kPrimaryColor,
-                      side: const BorderSide(color: Colors.black, width: 1.2),
+                      side: BorderSide(
+                        color: isDark ? const Color(0xFF2A3140) : Colors.black,
+                        width: 1.2,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
