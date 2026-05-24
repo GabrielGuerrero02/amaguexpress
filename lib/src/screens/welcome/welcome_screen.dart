@@ -26,7 +26,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: kDefaultPadding * 3),
+            const SizedBox(height: kDefaultPadding * 3.2),
             ClipRRect(
               borderRadius: BorderRadius.circular(18),
               child: Image(
@@ -37,11 +37,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: kDefaultPadding * 2.2),
             Text(S.of(context).tWelcome,
                 style: const TextStyle(fontSize: 18),
                 textAlign: TextAlign.center),
-            const SizedBox(height: kDefaultPadding * 3),
+            const SizedBox(height: kDefaultPadding * 2.2),
             //PrimaryButton(
             //    text: S.of(context).bEstablishLocation,
             //    onPressed: _goToAddressScreen),
@@ -49,26 +49,74 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             //Center(child: Text(S.of(context).mEither)),
             //const SizedBox(height: 20.0),
             PrimaryButton(
-                text: S.of(context).bLogin, onPressed: _goToSigninScreen),
-            const SizedBox(height: kDefaultPadding * 2),
+              text: 'Iniciar sesión',
+              onPressed: _goToSigninScreen,
+            ),
+            const SizedBox(height: kDefaultPadding),
+            const Text(
+              'Explora tiendas y productos sin crear cuenta. Inicia sesión solo cuando quieras comprar.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: kDefaultPadding),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _continueAsGuest,
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white10
+                            : Colors.grey.shade500,
+                    foregroundColor: kPrimaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    minimumSize: const Size.fromHeight(48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    side: BorderSide(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white24
+                          : Colors.grey.shade700,
+                    ),
+                  ),
+                  child: const Text('Explorar como invitado'),
+                ),
+              ),
+            ),
+            const SizedBox(height: kDefaultPadding * 3.2),
             const Text(
                 'Al usar nuestro producto aceptas los terminos, condiciones y politicas de privacidad\nV: $kVersionn\nCreado por AmaguExpress',
                 textScaler: TextScaler.linear(0.8),
                 textAlign: TextAlign.center),
-            const SizedBox(height: kDefaultPadding),
+            const SizedBox(height: 20),
             TextButton(
-                onPressed: () => goToUrl('http://www.amaguexpress.com'),
-                child: const Text(
-                  'Politica de Privacidad',
-                  style: TextStyle(color: Colors.indigo),
-                )),
+              onPressed: () => goToUrl('http://www.amaguexpress.com'),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(0, 28),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Text(
+                'Politica de Privacidad',
+                style: TextStyle(color: Colors.indigo),
+              ),
+            ),
+            const SizedBox(height: 0),
             TextButton(
-                onPressed: () => goToUrl('http://www.amaguexpress.com'),
-                child: const Text(
-                  'Terminos y Condiciones',
-                  style: TextStyle(color: Colors.indigo),
-                )),
-            const SizedBox(height: kDefaultPadding * 3),
+              onPressed: () => goToUrl('http://www.amaguexpress.com'),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(0, 28),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Text(
+                'Terminos y Condiciones',
+                style: TextStyle(color: Colors.indigo),
+              ),
+            ),
+            const SizedBox(height: kDefaultPadding * 0.14),
           ],
         ),
       ),
@@ -92,5 +140,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         builder: (context) => const LoginScreen(),
       ),
     );
+  }
+
+  _continueAsGuest() async {
+    Navigator.of(context).pushReplacementNamed('tabs');
   }
 }

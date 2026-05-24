@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:amaguexpress/constants/constants.dart';
 import 'package:amaguexpress/src/screens/login/access_controller.dart';
@@ -46,8 +48,10 @@ class SignupScreen extends StatelessWidget {
                           PasswordInput(accessController),
                           const SizedBox(height: kDefaultPadding * 1.3),
                           SignupButton(accessController, formKey: _formKey),
-                          const SizedBox(height: kDefaultPadding * 1.3),
-                          GoogleButton(accessController),
+                          if (!kIsWeb && !Platform.isIOS) ...[
+                            const SizedBox(height: kDefaultPadding * 1.3),
+                            GoogleButton(accessController),
+                          ],
                           const SizedBox(height: kDefaultPadding * 7),
                         ],
                       ),

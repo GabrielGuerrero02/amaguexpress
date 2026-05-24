@@ -111,9 +111,10 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: kDefaultPadding * 1.3),
                             if (pref.user.roles.contains(TypesRol.deliveryman))
-                              _contentDeliveryMan(profileController),
+                              _contentDeliveryMan(context, profileController),
                             if (!pref.user.roles.contains(TypesRol.deliveryman))
-                              _contentIsNotDeliveryMan(profileController),
+                              _contentIsNotDeliveryMan(
+                                  context, profileController),
                             const SizedBox(height: kDefaultPadding * 2.6),
                           ],
                         ),
@@ -137,7 +138,8 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _contentDeliveryMan(ProfileController profileController) {
+  Widget _contentDeliveryMan(
+      BuildContext context, ProfileController profileController) {
     return Column(
       children: [
         BalanceInput(profileController.balance.balance),
@@ -149,23 +151,101 @@ class ProfileScreen extends StatelessWidget {
         EmailInput(profileController),
         const SizedBox(height: kDefaultPadding * 2.6),
         ChangePasswordButton(profileController),
+        const SizedBox(height: kDefaultPadding * 0.8),
+        _deleteAccountButton(context),
       ],
     );
   }
 
-  Widget _contentIsNotDeliveryMan(ProfileController profileController) {
+  Widget _contentIsNotDeliveryMan(
+      BuildContext context, ProfileController profileController) {
     return Column(
       children: [
         MoneyInput(profileController.balance.money),
-        const SizedBox(height: kDefaultPadding * 1.3),
+        const SizedBox(height: kDefaultPadding * 0.5),
         NameInput(profileController),
-        const SizedBox(height: kDefaultPadding * 1.3),
+        const SizedBox(height: kDefaultPadding * 0.5),
         PhoneInput(profileController),
-        const SizedBox(height: kDefaultPadding * 1.3),
+        const SizedBox(height: kDefaultPadding * 0.5),
         EmailInput(profileController),
-        const SizedBox(height: kDefaultPadding * 2.6),
+        const SizedBox(height: kDefaultPadding * 1.3),
         ChangePasswordButton(profileController),
+        const SizedBox(height: kDefaultPadding * 0.8),
+        _deleteAccountButton(context),
       ],
+    );
+  }
+
+  Widget _deleteAccountButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (dialogContext) => AlertDialog(
+                backgroundColor: const Color(0xFF1F1F1F),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  side: const BorderSide(color: Colors.white24, width: 1.2),
+                ),
+                title: const Text(
+                  'Eliminar cuenta',
+                  style: TextStyle(color: Colors.white),
+                ),
+                content: const Text(
+                  'La eliminación de la cuenta es definitiva y no se puede deshacer. ¿Deseas continuar?',
+                  style: TextStyle(color: Colors.white70),
+                ),
+                actions: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.grey.shade800,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: const Text('Cancelar'),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.grey.shade800,
+                      foregroundColor: const Color(0xFF8B0000),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    child: const Text('Continuar'),
+                  ),
+                ],
+              ),
+            );
+          },
+          style: OutlinedButton.styleFrom(
+            backgroundColor: Colors.grey.shade700,
+            foregroundColor: const Color(0xFF8B0000),
+            side: const BorderSide(color: Color(0xFF8B0000), width: 1.1),
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50),
+            ),
+          ),
+          child: const Text('Eliminar cuenta'),
+        ),
+      ),
     );
   }
 
