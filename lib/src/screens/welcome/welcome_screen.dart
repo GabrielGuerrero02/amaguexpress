@@ -49,7 +49,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             //Center(child: Text(S.of(context).mEither)),
             //const SizedBox(height: 20.0),
             PrimaryButton(
-              text: 'Iniciar sesión',
+              text: 'Ingresar',
               onPressed: _goToSigninScreen,
             ),
             const SizedBox(height: kDefaultPadding),
@@ -68,7 +68,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     backgroundColor:
                         Theme.of(context).brightness == Brightness.dark
                             ? Colors.white10
-                            : Colors.grey.shade500,
+                            : const Color.fromARGB(255, 108, 107, 107),
                     foregroundColor: kPrimaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 18),
                     minimumSize: const Size.fromHeight(48),
@@ -81,7 +81,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           : Colors.grey.shade700,
                     ),
                   ),
-                  child: const Text('Explorar como invitado'),
+                  child: const Text(
+                    'Explorar como invitado',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ),

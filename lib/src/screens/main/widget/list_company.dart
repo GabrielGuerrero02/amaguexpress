@@ -20,7 +20,11 @@ class ListCompany extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 210),
+        maxCrossAxisExtent: 210,
+        mainAxisExtent: 240,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
       children: List.generate(
         companies.length,
         (index) {
@@ -105,9 +109,9 @@ class _Company extends StatelessWidget {
     return Column(
       children: <Widget>[
         Container(
-          width: 180,
-          height: 150,
-          margin: const EdgeInsets.only(top: 10),
+          width: double.infinity,
+          height: 145,
+          margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
           decoration: BoxDecoration(
             color: Colors.grey[200],
             borderRadius: BorderRadius.circular(10),
@@ -130,6 +134,8 @@ class _Company extends StatelessWidget {
               company.name,
               style: const TextStyle(color: Colors.blueGrey, fontSize: 12.0),
               textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             )),
           ),
         ),

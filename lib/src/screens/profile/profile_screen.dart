@@ -152,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: kDefaultPadding * 2.6),
         ChangePasswordButton(profileController),
         const SizedBox(height: kDefaultPadding * 0.8),
-        _deleteAccountButton(context),
+        _deleteAccountButton(context, profileController),
       ],
     );
   }
@@ -171,12 +171,13 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: kDefaultPadding * 1.3),
         ChangePasswordButton(profileController),
         const SizedBox(height: kDefaultPadding * 0.8),
-        _deleteAccountButton(context),
+        _deleteAccountButton(context, profileController),
       ],
     );
   }
 
-  Widget _deleteAccountButton(BuildContext context) {
+  Widget _deleteAccountButton(
+      BuildContext context, ProfileController profileController) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: SizedBox(
@@ -196,7 +197,7 @@ class ProfileScreen extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 content: const Text(
-                  'La eliminación de la cuenta es definitiva y no se puede deshacer. ¿Deseas continuar?',
+                  'La eliminación de la cuenta es definitiva y no se puede deshacer. Tus datos de acceso serán removidos y, si lo deseas, podrás crear una cuenta nueva más adelante con el mismo correo o número. ¿Deseas continuar?',
                   style: TextStyle(color: Colors.white70),
                 ),
                 actions: [
@@ -227,7 +228,39 @@ class ProfileScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: () => Navigator.of(dialogContext).pop(),
+                    onPressed: () async {
+                      final navigator = Navigator.of(context);
+                      final scaffoldMessenger = ScaffoldMessenger.of(context);
+                      final s = S.of(context);
+                      final isDeleted = await profileController.deleteAccount();
+
+                      if (!context.mounted) return;
+
+                      Navigator.of(dialogContext).pop();
+
+                      if (!isDeleted) {
+                        scaffoldMessenger.showSnackBar(SnackBar(
+                          content: Text(s.errUnknown),
+                        ));
+                        return;
+                      }
+
+                      if (pref.user.roles.contains(TypesRol.deliveryman)) {
+                        LocationBloc().stop();
+                      }
+
+                      scaffoldMessenger.showSnackBar(const SnackBar(
+                        content: Text('Cuenta eliminada correctamente'),
+                      ));
+
+                      pref.clean();
+                      navigator.pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const WelcomeScreen(),
+                        ),
+                        (Route<dynamic> route) => false,
+                      );
+                    },
                     child: const Text('Continuar'),
                   ),
                 ],

@@ -45,7 +45,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Se necesita acceso a tu ubicación para mostrar el mapa.</string>
+	<string>AmaguExpress usa tu ubicación para mostrar tiendas cercanas, ayudarte a seleccionar tu dirección de entrega y cargar productos disponibles en tu zona.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

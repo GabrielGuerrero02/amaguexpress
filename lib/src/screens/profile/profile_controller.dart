@@ -81,6 +81,13 @@ class ProfileController with ChangeNotifier {
     return await authService.logOut();
   }
 
+  Future<bool> deleteAccount() async {
+    inAsyncCall = true;
+    bool isDeleted = await authService.deleteAccount();
+    inAsyncCall = false;
+    return isDeleted;
+  }
+
   Future<int> update() async {
     inAsyncCall = true;
     Map<String, dynamic>? decodedResp =

@@ -14,6 +14,7 @@ const _urlUpdatePasswor = 'auth/update-passwor';
 const _urlGoogle = 'auth/google';
 const _urlRecover = 'auth/recover';
 const _urlLogOut = 'auth/log-out';
+const _urlDeleteAccount = 'auth/delete-account';
 const _urlUpdateTokenPush = 'auth/update-token-push';
 
 class AuthService {
@@ -104,6 +105,27 @@ class AuthService {
     } catch (err) {
       if (kDebugMode) {
         print('AuthService logOut: $err');
+      }
+    } finally {
+      client.close();
+    }
+    return false;
+  }
+
+  Future<bool> deleteAccount() async {
+    var client = http.Client();
+    try {
+      final resp = await client.delete(
+        Uri.parse('$kDomain$_urlDeleteAccount'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer ${prefs.token}',
+        },
+      );
+      if (resp.statusCode == 200) return true;
+    } catch (err) {
+      if (kDebugMode) {
+        print('AuthService deleteAccount: $err');
       }
     } finally {
       client.close();

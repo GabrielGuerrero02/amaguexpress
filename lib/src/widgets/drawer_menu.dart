@@ -127,27 +127,31 @@ class Header extends StatelessWidget {
           progressColor: kPrimaryColor,
         ),
         const SizedBox(width: kDefaultPadding),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-                child: Text(pref.user.fullName,
-                    textScaler: const TextScaler.linear(1.4),
-                    overflow: TextOverflow.visible)),
-            SizedBox(
-                child: Text(
-              pref.user.email,
-              textScaler: const TextScaler.linear(0.9),
-              softWrap: false,
-              overflow: TextOverflow.visible,
-              style: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xFFB7BFCC)
-                    : kSecondaryColor,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                pref.user.fullName,
+                textScaler: const TextScaler.linear(1.2),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-            )),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                pref.user.email,
+                textScaler: const TextScaler.linear(0.9),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFFB7BFCC)
+                      : kSecondaryColor,
+                ),
+              ),
+            ],
+          ),
         )
       ],
     );
@@ -207,13 +211,30 @@ class Footer extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => AboutScreen()));
           },
         ),
-        ListTile(
-          leading: const Icon(Icons.smart_toy_outlined, color: kPrimaryColor),
-          title: const Text("Habla con Amagú"),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.pushNamed(context, '/chatbot');
-          },
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: Material(
+            color: kPrimaryColor,
+            borderRadius: BorderRadius.circular(12),
+            child: ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              leading:
+                  const Icon(Icons.smart_toy_outlined, color: Colors.white),
+              title: const Text(
+                "Habla con Amagú",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/chatbot');
+              },
+            ),
+          ),
         ),
         const Divider(),
         const SizedBox(height: 1),
