@@ -113,10 +113,11 @@ class _ContentOrderState extends State<ContentOrder>
         ),
         FloatingHead(orderController: widget.orderController),
         FloatingSheetBottom(orderController: widget.orderController),
-        widget.orderController.order.status == StatusOrder.delivered ||
-                widget.orderController.order.status == StatusOrder.cancelled
+        widget.orderController.order.status == StatusOrder.delivered
             ? ScoreDialog(widget.orderController)
-            : Container()
+            : widget.orderController.order.status == StatusOrder.cancelled
+                ? CancelledOrderDialog(widget.orderController)
+                : Container()
       ],
     );
   }
@@ -181,5 +182,44 @@ class ScoreDialog extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class CancelledOrderDialog extends StatefulWidget {
+  const CancelledOrderDialog(this.orderController, {super.key});
+
+  final OrderController orderController;
+
+  @override
+  State<CancelledOrderDialog> createState() => _CancelledOrderDialogState();
+}
+
+class _CancelledOrderDialogState extends State<CancelledOrderDialog> {
+  bool _shown = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_shown) {
+      _shown = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pedido cancelado'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+
+        Provider.of<Tab1Controller>(context, listen: false).load();
+        final tab2Controller =
+            Provider.of<Tab2Controller>(context, listen: false);
+        tab2Controller.hideCancelledOrder(widget.orderController.order.id);
+        Provider.of<TabManController>(context, listen: false).currentScreen = 0;
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      });
+    }
+
+    return const SizedBox.shrink();
   }
 }

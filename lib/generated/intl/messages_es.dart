@@ -169,7 +169,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "lStatusOrderAssigned": MessageLookupByLibrary.simpleMessage(
             "🛵 El repartidor se dirige a recoger tu pedido"),
         "lStatusOrderCancelled": MessageLookupByLibrary.simpleMessage(
-            "🥺 Oops. Lo sentimos, pero el pedido ha sido cancelado. Por favor, califiqua tu experiencia"),
+            "🥺 Oops. Lo sentimos, pero el pedido ha sido cancelado, si pagaste con tarjeta o transferencia tu dinero volverà a tu Saldo"),
         "lStatusOrderDelivered": MessageLookupByLibrary.simpleMessage(
             "🥳 Gracias por preferirnos. Por favor, califiqua tu experiencia"),
         "lStatusOrderQualified":
@@ -181,7 +181,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "lStatusTaxiAssigned": MessageLookupByLibrary.simpleMessage(
             "🚖 Se le ha asignado un taxi. 🚕 El taxi se dirige a su ubicación"),
         "lStatusTaxiCancelled": MessageLookupByLibrary.simpleMessage(
-            "🥺 Oops. Lo sentimos, pero el pedido ha sido cancelado. Por favor, califiqua tu experiencia"),
+            "🥺 Oops. Lo sentimos, pero el pedido ha sido cancelado, si pagaste con tarjeta o transferencia tu dinero volverà a tu Saldo"),
         "lStatusTaxiDelivered": MessageLookupByLibrary.simpleMessage(
             "🥳 Gracias por preferirnos. Por favor, califiqua tu experiencia"),
         "lStatusTaxiQualified":

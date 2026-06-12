@@ -140,14 +140,14 @@
     "lStatusOrderAssigned" : "🛵 El repartidor se dirige a recoger tu pedido",
     "lStatusOrderTaken" : "💚 El repartidor ya tiene tu pedido",
     "lStatusOrderDelivered" : "🥳 Gracias por preferirnos. Por favor, califiqua tu experiencia",
-    "lStatusOrderCancelled" : "🥺 Oops. Lo sentimos, pero el pedido ha sido cancelado. Por favor, califiqua tu experiencia",
+    "lStatusOrderCancelled" : "🥺 Oops. Lo sentimos, pero el pedido ha sido cancelado, si pagaste con tarjeta o transferencia tu dinero volverà a tu Saldo",
     "lStatusOrderQualified" : "Gracias por preferirnos",
 
     "lStatusTaxiStarted" : "🔎 Estamos buscando una unidad cercana",
     "lStatusTaxiAssigned" : "🚖 Se le ha asignado un taxi. 🚕 El taxi se dirige a su ubicación",
     "lStatusTaxiTaken" : "💚 El conductor ha informado de que ha subido al vehículo",
     "lStatusTaxiDelivered" : "🥳 Gracias por preferirnos. Por favor, califiqua tu experiencia",
-    "lStatusTaxiCancelled" : "🥺 Oops. Lo sentimos, pero el pedido ha sido cancelado. Por favor, califiqua tu experiencia",
+    "lStatusTaxiCancelled" : "🥺 Oops. Lo sentimos, pero el pedido ha sido cancelado, si pagaste con tarjeta o transferencia tu dinero volverà a tu Saldo",
     "lStatusTaxiQualified" : "Gracias por preferirnos",
 
     "mDConfirmOrder" : "Confirma que has recogido el pedido",

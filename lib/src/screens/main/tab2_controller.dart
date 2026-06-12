@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/constants/types_constant.dart';
 import 'package:amaguexpress/src/models/order_model.dart';
 import 'package:amaguexpress/src/provider/push_provider.dart';
@@ -13,6 +14,7 @@ class Tab2Controller with ChangeNotifier {
   int _numOrders = 0;
 
   List<OrderModel> orders = [];
+  final Set<int> _hiddenCancelledOrderIds = {};
 
   bool get inAsyncCall => _inAsyncCall;
 
@@ -56,9 +58,23 @@ class Tab2Controller with ChangeNotifier {
     notifyListeners();
   }
 
+  hideCancelledOrder(int orderId) {
+    _hiddenCancelledOrderIds.add(orderId);
+    orders = orders
+        .where((order) => !(order.status == StatusOrder.cancelled &&
+            _hiddenCancelledOrderIds.contains(order.id)))
+        .toList();
+    numOrders = orders.length;
+    notifyListeners();
+  }
+
   loadOrders() async {
     inAsyncCall = true;
-    orders = await marketService.getOrders();
+    final loadedOrders = await marketService.getOrders();
+    orders = loadedOrders
+        .where((order) => !(order.status == StatusOrder.cancelled &&
+            _hiddenCancelledOrderIds.contains(order.id)))
+        .toList();
     numOrders = orders.length;
     inAsyncCall = false;
     notifyListeners();
