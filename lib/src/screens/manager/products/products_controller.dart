@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show ChangeNotifier;
+import 'package:flutter/material.dart';
 import 'package:amaguexpress/src/models/company_product_model.dart';
 import 'package:amaguexpress/src/models/store_company_model.dart';
 import 'package:amaguexpress/src/services/store_manager_service.dart';
@@ -20,6 +20,8 @@ class ProductsController extends ChangeNotifier {
 
   bool get inAsyncCall => _inAsyncCall;
 
+  bool get manualOffline => storeCompany.manualOffline;
+
   set inAsyncCall(bool asyncCall) {
     _inAsyncCall = asyncCall;
     notifyListeners();
@@ -29,6 +31,25 @@ class ProductsController extends ChangeNotifier {
     inAsyncCall = true;
     _products = await _storeManagerService.getProducts(storeCompany.company.id);
     inAsyncCall = false;
+  }
+
+  Future<bool> toggleManualOffline() async {
+    inAsyncCall = true;
+
+    final updatedStore = await _storeManagerService.updateManualOffline(
+      storeCompany,
+      !storeCompany.manualOffline,
+    );
+
+    inAsyncCall = false;
+
+    if (updatedStore == null) {
+      return false;
+    }
+
+    storeCompany.manualOffline = updatedStore.manualOffline;
+    notifyListeners();
+    return true;
   }
 
   setProducts(CompanyProductModel companyProduct) {

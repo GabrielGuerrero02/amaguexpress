@@ -54,7 +54,9 @@ class _Company extends StatelessWidget {
     return Stack(
       children: <Widget>[
         card,
-        company.isOpen ? Container() : _closedLabel(context),
+        company.isOpen
+            ? Container()
+            : _closedLabel(context, company.closedReason),
         Positioned.fill(
           child: Material(
             color: Colors.transparent,
@@ -143,16 +145,27 @@ class _Company extends StatelessWidget {
     );
   }
 
-  Widget _closedLabel(BuildContext context) {
+  String _closedText(BuildContext context, String? closedReason) {
+    switch (closedReason) {
+      case 'manual':
+        return 'Cerrado\ntemporalmente';
+      case 'schedule':
+        return 'Cerrado\nfuera de horario';
+      default:
+        return S.of(context).lClosed;
+    }
+  }
+
+  Widget _closedLabel(BuildContext context, String? closedReason) {
     return Positioned(
-      top: 10.0,
-      left: -55,
+      top: 12.0,
+      left: -58,
       child: Transform.rotate(
         alignment: FractionalOffset.center,
         angle: 345.0,
         child: Container(
-          height: 40.0,
-          width: 200.0,
+          height: 46.0,
+          width: 210.0,
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: (0.8 * 255)),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -162,9 +175,10 @@ class _Company extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text(S.of(context).lClosed,
-                  style: const TextStyle(color: Colors.white),
-                  textAlign: TextAlign.center),
+              Text(_closedText(context, closedReason),
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                  textAlign: TextAlign.center,
+                  maxLines: 2),
             ],
           ),
         ),

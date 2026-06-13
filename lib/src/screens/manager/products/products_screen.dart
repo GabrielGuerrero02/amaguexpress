@@ -48,6 +48,65 @@ class ProductsScreen extends StatelessWidget {
               Visibility(
                   visible: productsController.inAsyncCall,
                   child: const LinearProgressIndicator()),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.fromLTRB(
+                  kDefaultPadding,
+                  kDefaultPadding,
+                  kDefaultPadding,
+                  0,
+                ),
+                padding: const EdgeInsets.all(kDefaultPadding),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(kDefaultPadding),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        productsController.manualOffline
+                            ? 'Estado: Cerrada temporalmente'
+                            : 'Estado: Tienda operando',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: productsController.manualOffline
+                            ? kPrimaryColor
+                            : Colors.black87,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: productsController.inAsyncCall
+                          ? null
+                          : () async {
+                              final ok = await productsController
+                                  .toggleManualOffline();
+
+                              if (!context.mounted) return;
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    ok
+                                        ? productsController.manualOffline
+                                            ? 'Tienda cerrada temporalmente'
+                                            : 'Tienda reanudada'
+                                        : 'No se pudo cambiar el estado. Verifica el horario de atención.',
+                                  ),
+                                ),
+                              );
+                            },
+                      child: Text(
+                        productsController.manualOffline
+                            ? 'Reanudar'
+                            : 'Pausar',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Expanded(
                   child: ListView.builder(
                 itemCount: productsController.products.length,

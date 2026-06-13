@@ -5,6 +5,9 @@ class CompanyModel {
     required this.id,
     required this.storeId,
     required this.isOpen,
+    this.isOpenBySchedule = false,
+    this.manualOffline = false,
+    this.closedReason,
     required this.name,
     required this.address,
     required this.contact,
@@ -19,6 +22,9 @@ class CompanyModel {
   int id;
   int storeId;
   bool isOpen;
+  bool isOpenBySchedule;
+  bool manualOffline;
+  String? closedReason;
   String name;
   String address;
   String contact;
@@ -33,6 +39,9 @@ class CompanyModel {
         id: json["id"],
         storeId: json["storeId"],
         isOpen: json["isOpen"],
+        isOpenBySchedule: json["isOpenBySchedule"] ?? json["isOpen"],
+        manualOffline: json["manualOffline"] ?? false,
+        closedReason: json["closedReason"],
         name: json["name"],
         address: json["address"],
         contact: json["contact"],
@@ -48,6 +57,9 @@ class CompanyModel {
         "id": id,
         "storeId": storeId,
         "isOpen": isOpen,
+        "isOpenBySchedule": isOpenBySchedule,
+        "manualOffline": manualOffline,
+        "closedReason": closedReason,
         "name": name,
         "address": address,
         "contact": contact,

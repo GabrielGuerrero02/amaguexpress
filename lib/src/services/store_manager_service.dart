@@ -14,6 +14,7 @@ const _urlCreateProduct = 'manager/store/product';
 const _urlUpdateProduct = 'manager/store/product';
 const _urlGetHours = 'manager/store/hours';
 const _urlUpdateHour = 'manager/store/hours';
+const _urlManualOffline = 'manager/store';
 
 class StoreManagerService {
   final prefs = PreferencesProvider();
@@ -151,6 +152,44 @@ class StoreManagerService {
     } catch (err) {
       if (kDebugMode) {
         print('StoreManagerService updateProduct: $err');
+      }
+    } finally {
+      client.close();
+    }
+    return null;
+  }
+
+  Future<StoreCompanyModel?> updateManualOffline(
+      StoreCompanyModel storeCompany, bool manualOffline) async {
+    var client = http.Client();
+    try {
+      final resp = await client.patch(
+        Uri.parse(
+            '$kDomain$_urlManualOffline/${storeCompany.id}/manual-offline'),
+        headers: {
+          'Authorization': 'Bearer ${prefs.token}',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: json.encode({'manualOffline': manualOffline}),
+      );
+
+      final decodedResp = json.decode(resp.body);
+
+      if (resp.statusCode != 200) {
+        if (kDebugMode) {
+          print(
+              'StoreManagerService updateManualOffline: ${decodedResp['message']}');
+        }
+        return null;
+      }
+
+      storeCompany.manualOffline =
+          decodedResp['store']['manualOffline'] ?? manualOffline;
+
+      return storeCompany;
+    } catch (err) {
+      if (kDebugMode) {
+        print('StoreManagerService updateManualOffline: $err');
       }
     } finally {
       client.close();

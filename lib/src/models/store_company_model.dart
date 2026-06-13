@@ -17,6 +17,7 @@ class StoreCompanyModel {
     required this.costKm,
     required this.location,
     required this.sales,
+    this.manualOffline = false,
     required this.createdAt,
     required this.updatedAt,
     required this.company,
@@ -31,6 +32,7 @@ class StoreCompanyModel {
   double costKm;
   Location location;
   int sales;
+  bool manualOffline;
   DateTime createdAt;
   DateTime updatedAt;
   Company company;
@@ -46,6 +48,7 @@ class StoreCompanyModel {
         costKm: json["costKm"].toDouble(),
         location: Location.fromJson(json["location"]),
         sales: json["sales"],
+        manualOffline: json["manualOffline"] ?? false,
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         company: Company.fromJson(json["company"]),
@@ -61,6 +64,7 @@ class StoreCompanyModel {
         "costKm": costKm,
         "location": location.toJson(),
         "sales": sales,
+        "manualOffline": manualOffline,
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "company": company.toJson(),
