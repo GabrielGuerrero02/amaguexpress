@@ -12,6 +12,7 @@ const _urlGetStoresCompanies = 'manager/store/companies';
 const _urlGetProducts = 'manager/store/products';
 const _urlCreateProduct = 'manager/store/product';
 const _urlUpdateProduct = 'manager/store/product';
+const _urlUpdateProductVisibility = 'manager/store/product';
 const _urlGetHours = 'manager/store/hours';
 const _urlUpdateHour = 'manager/store/hours';
 const _urlManualOffline = 'manager/store';
@@ -152,6 +153,41 @@ class StoreManagerService {
     } catch (err) {
       if (kDebugMode) {
         print('StoreManagerService updateProduct: $err');
+      }
+    } finally {
+      client.close();
+    }
+    return null;
+  }
+
+  Future<CompanyProductModel?> updateProductVisibility(
+      CompanyProductModel companyProduct, bool isVisible) async {
+    var client = http.Client();
+    try {
+      final resp = await client.patch(
+        Uri.parse(
+            '$kDomain$_urlUpdateProductVisibility/${companyProduct.id}/visibility'),
+        headers: {
+          'Authorization': 'Bearer ${prefs.token}',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: json.encode({'isVisible': isVisible}),
+      );
+
+      final decodedResp = json.decode(resp.body);
+
+      if (resp.statusCode != 200) {
+        if (kDebugMode) {
+          print(
+              'StoreManagerService updateProductVisibility: ${decodedResp['message']}');
+        }
+        return null;
+      }
+
+      return CompanyProductModel.fromJson(decodedResp['product']);
+    } catch (err) {
+      if (kDebugMode) {
+        print('StoreManagerService updateProductVisibility: $err');
       }
     } finally {
       client.close();

@@ -10,6 +10,7 @@ class ProductModel {
     required this.type,
     required this.price,
     required this.image,
+    this.isVisible = true,
     this.number = 1,
     this.note = '',
     this.lt = 0.0,
@@ -23,6 +24,7 @@ class ProductModel {
   int type;
   double price;
   String image;
+  bool isVisible;
 
   bool isInCart = false;
 
@@ -44,6 +46,7 @@ class ProductModel {
         type: json["type"],
         price: json["price"].toDouble(),
         image: json["image"],
+        isVisible: json["isVisible"] ?? true,
         number: json["number"] ?? 1,
         note: json["note"] ?? '',
         lt: json["lt"] ?? 0.0,
@@ -56,6 +59,7 @@ class ProductModel {
         "description": description,
         "price": price,
         "image": image,
+        "isVisible": isVisible,
         "number": number,
         "total": double.parse(total.toStringAsFixed(kCoinDecimals)),
         "note": note,

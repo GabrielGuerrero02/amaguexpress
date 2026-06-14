@@ -16,6 +16,7 @@ class CompanyProductModel {
     this.image = '',
     this.type = 1,
     this.price = 0.0,
+    this.isVisible = true,
     this.group,
   });
 
@@ -25,6 +26,7 @@ class CompanyProductModel {
   String image;
   int type;
   double price;
+  bool isVisible;
   GroupModel? group = GroupModel(id: 0);
 
   factory CompanyProductModel.fromJson(Map<String, dynamic> json) =>
@@ -35,6 +37,7 @@ class CompanyProductModel {
         image: json["image"],
         type: json["type"],
         price: json["price"].toDouble(),
+        isVisible: json["isVisible"] ?? true,
         group:
             json["group"] == null ? null : GroupModel.fromJson(json["group"]),
       );
@@ -46,6 +49,7 @@ class CompanyProductModel {
         "image": image,
         "type": type,
         "price": price,
+        "isVisible": isVisible,
       };
 
   Object toHttpBodyCreate(int companyId) => jsonEncode({
@@ -54,6 +58,7 @@ class CompanyProductModel {
         "image": image.trim(),
         "type": type,
         "price": price,
+        "isVisible": isVisible,
         "company": {"id": companyId},
         "group": {"id": group!.id}
       });
@@ -64,6 +69,7 @@ class CompanyProductModel {
         "image": image.trim(),
         "type": type,
         "price": price,
+        "isVisible": isVisible,
         "group": {"id": group!.id}
       });
 }

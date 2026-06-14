@@ -52,6 +52,25 @@ class ProductsController extends ChangeNotifier {
     return true;
   }
 
+  Future<bool> toggleProductVisibility(
+      CompanyProductModel companyProduct) async {
+    inAsyncCall = true;
+
+    final updatedProduct = await _storeManagerService.updateProductVisibility(
+      companyProduct,
+      !companyProduct.isVisible,
+    );
+
+    inAsyncCall = false;
+
+    if (updatedProduct == null) {
+      return false;
+    }
+
+    setProducts(updatedProduct);
+    return true;
+  }
+
   setProducts(CompanyProductModel companyProduct) {
     final index = products.indexWhere((pr) => pr.id == companyProduct.id);
     if (index < 0) {
