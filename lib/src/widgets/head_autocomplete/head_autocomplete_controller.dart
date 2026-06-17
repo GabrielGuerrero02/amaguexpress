@@ -12,6 +12,7 @@ class HeadAutocompleteController extends ChangeNotifier {
   final Function getController;
   final double latitude;
   final double longitude;
+  bool _isDisposed = false;
 
   HeadAutocompleteController({
     required this.getController,
@@ -22,24 +23,37 @@ class HeadAutocompleteController extends ChangeNotifier {
   autocomplete(String place) async {
     if (place.length < 3) {
       predictions.clear();
-      notifyListeners();
+      if (!_isDisposed) notifyListeners();
       return;
     }
     predictions =
         await addressService.autocomplete(place, lt: latitude, lg: longitude);
+
+    if (_isDisposed) return;
+
     notifyListeners();
   }
 
   geocode(String placeId) async {
     Location? location = await addressService.geocode(placeId);
-    if (location == null) return;
+    if (_isDisposed || location == null) return;
+
     try {
-      (await getController()).animateCamera(CameraUpdate.newCameraPosition(
+      final GoogleMapController controller = await getController();
+
+      if (_isDisposed) return;
+
+      await controller.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: LatLng(location.x, location.y), zoom: 16)));
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      debugPrint(
+          'HeadAutocompleteController.geocode animateCamera ignored: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }

@@ -11,10 +11,13 @@ import 'package:amaguexpress/src/services/address_service.dart';
 class AddressController extends ChangeNotifier {
   final AddressService addressService = AddressService();
   late AddressModel _address;
-  Completer<GoogleMapController> _completer = Completer();
+  final Completer<GoogleMapController> _completer = Completer();
+  GoogleMapController? _mapController;
+  bool _isDisposed = false;
   late CameraPosition initialCameraPosition;
 
-  Future<GoogleMapController> getController() async => await _completer.future;
+  Future<GoogleMapController> getController() async =>
+      _mapController ?? await _completer.future;
 
   AddressController(AddressModel address) {
     _address = address;
@@ -33,8 +36,13 @@ class AddressController extends ChangeNotifier {
   }
 
   onMapCreated(GoogleMapController controller) async {
-    _completer = Completer();
-    _completer.complete(controller);
+    if (_isDisposed) return;
+
+    _mapController = controller;
+
+    if (!_completer.isCompleted) {
+      _completer.complete(controller);
+    }
   }
 
   onCameraMove(CameraPosition cameraPosition) {
@@ -76,13 +84,21 @@ class AddressController extends ChangeNotifier {
     final List location = await _locationBloc.determinePosition();
     inAsyncCall = false;
     try {
-      final GoogleMapController controller = await _completer.future;
-      controller.animateCamera(CameraUpdate.newCameraPosition(
+      final GoogleMapController controller = await getController();
+
+      if (_isDisposed) return;
+
+      await controller.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: LatLng(location[0], location[1]), zoom: 16)));
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      debugPrint('AddressController.myLocation animateCamera ignored: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _mapController = null;
+    super.dispose();
   }
 }

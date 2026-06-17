@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart' show ChangeNotifier;
+import 'package:flutter/material.dart' show ChangeNotifier, debugPrint;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:amaguexpress/constants/constants.dart';
 import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/constants/types_constant.dart';
 import 'package:amaguexpress/src/bloc/socket_bloc.dart';
@@ -26,7 +25,9 @@ class OrderController extends ChangeNotifier {
   late OrderModel _order;
   final SocketBloc _socketBloc = SocketBloc();
 
-  Completer<GoogleMapController> _completer = Completer();
+  final Completer<GoogleMapController> _completer = Completer();
+  GoogleMapController? _mapController;
+  bool _isDisposed = false;
   late CameraPosition initialCameraPosition;
 
   OrderController(OrderModel order) {
@@ -39,8 +40,8 @@ class OrderController extends ChangeNotifier {
       _order = OrderModel.fromJson(order.toJson());
       //print('Después de deserializar OrderModel');
     } catch (e, stack) {
-      print('Error al deserializar OrderModel en OrderController: $e');
-      print('Stacktrace: $stack');
+      debugPrint('Error al deserializar OrderModel en OrderController: $e');
+      debugPrint('Stacktrace: $stack');
     }
 
     // addMarkers();
@@ -87,11 +88,19 @@ class OrderController extends ChangeNotifier {
   }
 
   centerMap() async {
-    final GoogleMapController controller = await _completer.future;
-    controller.animateCamera(CameraUpdate.newLatLngBounds(
-        MapHelper().latLngBounds(
-            order.location.x, order.location.y, order.start.x, order.start.y),
-        130.0));
+    try {
+      final GoogleMapController controller =
+          _mapController ?? await _completer.future;
+
+      if (_isDisposed) return;
+
+      await controller.animateCamera(CameraUpdate.newLatLngBounds(
+          MapHelper().latLngBounds(
+              order.location.x, order.location.y, order.start.x, order.start.y),
+          130.0));
+    } catch (e) {
+      debugPrint('OrderController.centerMap animateCamera ignored: $e');
+    }
   }
 
   addMarkers() async {
@@ -103,18 +112,27 @@ class OrderController extends ChangeNotifier {
   Set<Marker> get markers => _markers.values.toSet();
 
   onMapCreated(GoogleMapController controller) async {
-    _completer = Completer();
-    _completer.complete(controller);
+    if (_isDisposed) return;
+
+    _mapController = controller;
+
+    if (!_completer.isCompleted) {
+      _completer.complete(controller);
+    }
 
     // Ensure base markers are always loaded for the client view.
     // (Store/Deliveryman screens may call this elsewhere, but the client needs it here.)
     await addMarkers();
+
+    if (_isDisposed) return;
 
     // If the order is already assigned/taken, start listening for deliveryman updates.
     await onListenerPositions();
   }
 
   onListenerPositions() async {
+    if (_isDisposed) return;
+
     _socketBloc.close();
     if (order.status == StatusOrder.assigned ||
         order.status == StatusOrder.taken) {
@@ -122,6 +140,7 @@ class OrderController extends ChangeNotifier {
       addMarkertDeliveryMan(order.start.x, order.start.y);
       _socketBloc.connect(order.deliveryman!.id);
       _socketBloc.stream.listen((position) {
+        if (_isDisposed) return;
         updateLocationDeliveryMan(position);
       });
     }
@@ -156,6 +175,8 @@ class OrderController extends ChangeNotifier {
   }
 
   updateLocationDeliveryMan(LatLng position) async {
+    if (_isDisposed || !_markers.containsKey(markerIdDeliveryMan)) return;
+
     LatLng oldPosition = _markers[markerIdDeliveryMan]!.position;
 
     double rotation = Geolocator.bearingBetween(oldPosition.latitude,
@@ -173,7 +194,9 @@ class OrderController extends ChangeNotifier {
 
   @override
   void dispose() {
-    super.dispose();
+    _isDisposed = true;
+    _mapController = null;
     _socketBloc.disposeStreams();
+    super.dispose();
   }
 }

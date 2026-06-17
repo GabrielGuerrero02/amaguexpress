@@ -13,7 +13,9 @@ class EnrollmentController extends ChangeNotifier {
   final EnrollmentService enrollmentService = EnrollmentService();
   final EnrollmentModel _enrollment =
       EnrollmentModel(location: Location(x: klatitudeMap, y: klongitudeMap));
-  Completer<GoogleMapController> _completer = Completer();
+  final Completer<GoogleMapController> _completer = Completer();
+  GoogleMapController? _mapController;
+  bool _isDisposed = false;
   late CameraPosition initialCameraPosition;
   CategoryModel _category = CategoryModel(id: 0, name: '', image: '');
 
@@ -24,7 +26,8 @@ class EnrollmentController extends ChangeNotifier {
 
   Completer<GoogleMapController> get completer => _completer;
 
-  Future<GoogleMapController> getController() async => await _completer.future;
+  Future<GoogleMapController> getController() async =>
+      _mapController ?? await _completer.future;
 
   CategoryModel get category => _category;
 
@@ -44,8 +47,13 @@ class EnrollmentController extends ChangeNotifier {
   }
 
   onMapCreated(GoogleMapController controller) async {
-    _completer = Completer();
-    _completer.complete(controller);
+    if (_isDisposed) return;
+
+    _mapController = controller;
+
+    if (!_completer.isCompleted) {
+      _completer.complete(controller);
+    }
   }
 
   onCameraMove(CameraPosition cameraPosition) {
@@ -84,13 +92,21 @@ class EnrollmentController extends ChangeNotifier {
     final List location = await _locationBloc.determinePosition();
     inAsyncCall = false;
     try {
-      final GoogleMapController controller = await _completer.future;
-      controller.animateCamera(CameraUpdate.newCameraPosition(
+      final GoogleMapController controller = await getController();
+
+      if (_isDisposed) return;
+
+      await controller.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: LatLng(location[0], location[1]), zoom: 16)));
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      debugPrint('EnrollmentController.myLocation animateCamera ignored: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _mapController = null;
+    super.dispose();
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart' show ChangeNotifier;
+import 'package:flutter/material.dart' show ChangeNotifier, debugPrint;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:amaguexpress/constants/types_constant.dart';
 import 'package:amaguexpress/src/common/file_helper.dart';
@@ -18,7 +18,9 @@ class RequestController extends ChangeNotifier {
   final MarkerId markerIdClient = const MarkerId('client');
   late RequestModel _request;
 
-  Completer<GoogleMapController> _completer = Completer();
+  final Completer<GoogleMapController> _completer = Completer();
+  GoogleMapController? _mapController;
+  bool _isDisposed = false;
 
   late CameraPosition initialCameraPosition;
 
@@ -54,11 +56,19 @@ class RequestController extends ChangeNotifier {
   }
 
   centerMap() async {
-    final GoogleMapController controller = await _completer.future;
-    controller.animateCamera(CameraUpdate.newLatLngBounds(
-        MapHelper().latLngBounds(request.location.x, request.location.y,
-            request.store.location.x, request.store.location.y),
-        130.0));
+    try {
+      final GoogleMapController controller =
+          _mapController ?? await _completer.future;
+
+      if (_isDisposed) return;
+
+      await controller.animateCamera(CameraUpdate.newLatLngBounds(
+          MapHelper().latLngBounds(request.location.x, request.location.y,
+              request.store.location.x, request.store.location.y),
+          130.0));
+    } catch (e) {
+      debugPrint('RequestController.centerMap animateCamera ignored: $e');
+    }
   }
 
   cleanNotificationsClient() {
@@ -91,8 +101,20 @@ class RequestController extends ChangeNotifier {
   Set<Marker> get markers => _markers.values.toSet();
 
   onMapCreated(GoogleMapController controller) async {
-    _completer = Completer();
-    _completer.complete(controller);
+    if (_isDisposed) return;
+
+    _mapController = controller;
+
+    if (!_completer.isCompleted) {
+      _completer.complete(controller);
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _mapController = null;
+    super.dispose();
   }
 
   addMarkertStore() async {

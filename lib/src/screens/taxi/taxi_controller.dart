@@ -16,10 +16,13 @@ class TaxiController extends ChangeNotifier {
   final AddressModel _address = AddressModel(location: Location(x: 0, y: 0));
 
   late TaxiModel _taxi;
-  Completer<GoogleMapController> _completer = Completer();
+  final Completer<GoogleMapController> _completer = Completer();
+  GoogleMapController? _mapController;
+  bool _isDisposed = false;
   late CameraPosition initialCameraPosition;
 
-  Future<GoogleMapController> getController() async => await _completer.future;
+  Future<GoogleMapController> getController() async =>
+      _mapController ?? await _completer.future;
 
   TaxiController(this.company) {
     _taxi = TaxiModel(
@@ -75,8 +78,13 @@ class TaxiController extends ChangeNotifier {
   }
 
   onMapCreated(GoogleMapController controller) async {
-    _completer = Completer();
-    _completer.complete(controller);
+    if (_isDisposed) return;
+
+    _mapController = controller;
+
+    if (!_completer.isCompleted) {
+      _completer.complete(controller);
+    }
   }
 
   onCameraMove(CameraPosition cameraPosition) {
@@ -102,13 +110,14 @@ class TaxiController extends ChangeNotifier {
     final List location = await _locationBloc.determinePosition();
     inAsyncCall = false;
     try {
-      final GoogleMapController controller = await _completer.future;
-      controller.animateCamera(CameraUpdate.newCameraPosition(
+      final GoogleMapController controller = await getController();
+
+      if (_isDisposed) return;
+
+      await controller.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: LatLng(location[0], location[1]), zoom: 16)));
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      debugPrint('TaxiController.myLocation animateCamera ignored: $e');
     }
   }
 
@@ -139,10 +148,24 @@ class TaxiController extends ChangeNotifier {
   }
 
   centerMap() async {
-    final GoogleMapController controller = await _completer.future;
-    controller.animateCamera(CameraUpdate.newLatLngBounds(
-        MapHelper().latLngBounds(_taxi.from.location.x, _taxi.from.location.y,
-            _taxi.to.location.x, _taxi.to.location.y),
-        130.0));
+    try {
+      final GoogleMapController controller = await getController();
+
+      if (_isDisposed) return;
+
+      await controller.animateCamera(CameraUpdate.newLatLngBounds(
+          MapHelper().latLngBounds(_taxi.from.location.x, _taxi.from.location.y,
+              _taxi.to.location.x, _taxi.to.location.y),
+          130.0));
+    } catch (e) {
+      debugPrint('TaxiController.centerMap animateCamera ignored: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _mapController = null;
+    super.dispose();
   }
 }
