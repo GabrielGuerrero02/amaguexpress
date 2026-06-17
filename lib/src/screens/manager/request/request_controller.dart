@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart' show ChangeNotifier, debugPrint;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/constants/types_constant.dart';
 import 'package:amaguexpress/src/common/file_helper.dart';
 import 'package:amaguexpress/src/common/map_helper.dart';
@@ -21,6 +22,7 @@ class RequestController extends ChangeNotifier {
   final Completer<GoogleMapController> _completer = Completer();
   GoogleMapController? _mapController;
   bool _isDisposed = false;
+  int _preparationTimeMinutes = 15;
 
   late CameraPosition initialCameraPosition;
 
@@ -80,9 +82,57 @@ class RequestController extends ChangeNotifier {
 
   bool get inAsyncCall => _inAsyncCall;
 
+  int get preparationTimeMinutes => _preparationTimeMinutes;
+
+  bool get isPendingStoreConfirmation =>
+      request.status == StatusOrder.pendingStoreConfirmation;
+
   set inAsyncCall(bool asyncCall) {
     _inAsyncCall = asyncCall;
     notifyListeners();
+  }
+
+  void increasePreparationTime() {
+    if (_preparationTimeMinutes >= 60) return;
+    _preparationTimeMinutes += 5;
+    notifyListeners();
+  }
+
+  void decreasePreparationTime() {
+    if (_preparationTimeMinutes <= 5) return;
+    _preparationTimeMinutes -= 5;
+    notifyListeners();
+  }
+
+  Future<bool> acceptRequest() async {
+    inAsyncCall = true;
+    try {
+      final acceptedRequest = await requestService.acceptRequest(
+        request,
+        preparationTimeMinutes,
+      );
+
+      if (acceptedRequest == null) return false;
+
+      request = acceptedRequest;
+      return true;
+    } finally {
+      inAsyncCall = false;
+    }
+  }
+
+  Future<bool> rejectRequest() async {
+    inAsyncCall = true;
+    try {
+      final rejectedRequest = await requestService.rejectRequest(request);
+
+      if (rejectedRequest == null) return false;
+
+      request = rejectedRequest;
+      return true;
+    } finally {
+      inAsyncCall = false;
+    }
   }
 
   RequestModel get request => _request;

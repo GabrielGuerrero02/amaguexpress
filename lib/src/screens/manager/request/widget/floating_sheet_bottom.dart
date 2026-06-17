@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:amaguexpress/constants/constants.dart';
+import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/constants/types_constant.dart';
 import 'package:amaguexpress/generated/l10n.dart';
 import 'package:amaguexpress/src/screens/manager/request/request_controller.dart';
@@ -96,10 +97,211 @@ class FloatingSheetBottom extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
+              if (requestController.request.status ==
+                  StatusOrder.pendingStoreConfirmation)
+                _PreparationApprovalCard(
+                  requestController: requestController,
+                ),
+              if (requestController.request.status ==
+                  StatusOrder.pendingStoreConfirmation)
+                const SizedBox(height: 12),
               DetailsProducts(request: requestController.request),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PreparationApprovalCard extends StatelessWidget {
+  final RequestController requestController;
+
+  const _PreparationApprovalCard({
+    required this.requestController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(kDefaultPadding),
+      decoration: BoxDecoration(
+        color: isDark
+            ? cs.surfaceContainerHighest
+            : kPrimaryColor.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: kPrimaryColor.withOpacity(isDark ? 0.35 : 0.22),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Pedido pendiente de aprobación',
+            style: TextStyle(
+              color: cs.onSurface,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Confirma si puedes preparar este pedido antes de enviarlo a un motorizado.',
+            style: TextStyle(
+              color: cs.onSurface.withOpacity(0.72),
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Tiempo de preparación',
+            style: TextStyle(
+              color: cs.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _TimeButton(
+                icon: Icons.remove,
+                onPressed: requestController.decreasePreparationTime,
+              ),
+              Container(
+                width: 110,
+                margin: const EdgeInsets.symmetric(horizontal: 14),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? cs.surface : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: kPrimaryColor.withOpacity(0.25),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${requestController.preparationTimeMinutes} min',
+                  style: TextStyle(
+                    color: cs.onSurface,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+              _TimeButton(
+                icon: Icons.add,
+                onPressed: requestController.increasePreparationTime,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: requestController.inAsyncCall
+                ? null
+                : () async {
+                    final accepted = await requestController.acceptRequest();
+
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          accepted
+                              ? 'Pedido aceptado'
+                              : 'No se pudo aceptar el pedido',
+                        ),
+                      ),
+                    );
+
+                    if (accepted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+            icon: const Icon(Icons.check_circle_outline),
+            label: Text(
+              requestController.inAsyncCall
+                  ? 'Procesando...'
+                  : 'Aceptar pedido',
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: requestController.inAsyncCall
+                ? null
+                : () async {
+                    final rejected = await requestController.rejectRequest();
+
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          rejected
+                              ? 'Pedido rechazado'
+                              : 'No se pudo rechazar el pedido',
+                        ),
+                      ),
+                    );
+
+                    if (rejected) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+            icon: const Icon(Icons.cancel_outlined),
+            label: const Text('Rechazar pedido'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: kErrorColor,
+              side: const BorderSide(color: kErrorColor),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimeButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _TimeButton({
+    required this.icon,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(24),
+      onTap: onPressed,
+      child: Container(
+        height: 48,
+        width: 48,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: kPrimaryColor.withOpacity(0.35),
+          ),
+        ),
+        child: Icon(icon, color: kPrimaryColor),
       ),
     );
   }

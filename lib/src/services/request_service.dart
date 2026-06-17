@@ -9,6 +9,8 @@ import 'package:amaguexpress/src/provider/preferences_provider.dart';
 const _urlNearRequest = 'manager/request/near/';
 const _urlOrderAtRequest = 'manager/request/ordered-at/';
 const _urlIdRequest = 'manager/request/id/';
+const _urlAcceptRequest = 'manager/request/accept/';
+const _urlRejectRequest = 'manager/request/reject/';
 
 class RequestService {
   final prefs = PreferencesProvider();
@@ -83,5 +85,60 @@ class RequestService {
       client.close();
     }
     return requests;
+  }
+
+  Future<RequestModel?> acceptRequest(
+    RequestModel request,
+    int preparationTimeMinutes,
+  ) async {
+    var client = http.Client();
+    try {
+      final resp = await client.patch(
+        Uri.parse('$kDomain$_urlAcceptRequest${request.id}'),
+        headers: {
+          'Authorization': 'Bearer ${prefs.token}',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'preparationTimeMinutes': preparationTimeMinutes,
+        }),
+      );
+
+      if (resp.statusCode != 200) return null;
+
+      Map<String, dynamic> decodedResp = json.decode(resp.body);
+      return RequestModel.fromJson(decodedResp['request']);
+    } catch (err) {
+      if (kDebugMode) {
+        print('RequestService acceptRequest: $err');
+      }
+    } finally {
+      client.close();
+    }
+    return null;
+  }
+
+  Future<RequestModel?> rejectRequest(RequestModel request) async {
+    var client = http.Client();
+    try {
+      final resp = await client.patch(
+        Uri.parse('$kDomain$_urlRejectRequest${request.id}'),
+        headers: {
+          'Authorization': 'Bearer ${prefs.token}',
+        },
+      );
+
+      if (resp.statusCode != 200) return null;
+
+      Map<String, dynamic> decodedResp = json.decode(resp.body);
+      return RequestModel.fromJson(decodedResp['request']);
+    } catch (err) {
+      if (kDebugMode) {
+        print('RequestService rejectRequest: $err');
+      }
+    } finally {
+      client.close();
+    }
+    return null;
   }
 }

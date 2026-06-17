@@ -5,6 +5,8 @@ import 'package:amaguexpress/generated/l10n.dart';
 String statusOrderLabel(int status, int companyType) {
   if (companyType == TypesCompany.store) {
     switch (status) {
+      case StatusOrder.pendingStoreConfirmation:
+        return 'Pendiente de aprobación';
       case StatusOrder.started:
         return S.current.lStatusOrderStarted;
       case StatusOrder.assigned:
@@ -22,6 +24,8 @@ String statusOrderLabel(int status, int companyType) {
     }
   } else if (companyType == TypesCompany.taxi) {
     switch (status) {
+      case StatusOrder.pendingStoreConfirmation:
+        return 'Pendiente de aprobación';
       case StatusOrder.started:
         return S.current.lStatusTaxiStarted;
       case StatusOrder.assigned:

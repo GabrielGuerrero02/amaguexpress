@@ -1,4 +1,5 @@
 class StatusOrder {
+  static const int pendingStoreConfirmation = 0;
   static const int started = 1;
   static const int assigned = 100;
   static const int taken = 101;

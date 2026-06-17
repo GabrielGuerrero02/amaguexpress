@@ -15,6 +15,10 @@ class RequestModel {
     required this.store,
     required this.notificationsDeliveryman,
     required this.payment,
+    this.preparationTimeMinutes,
+    this.estimatedReadyAt,
+    this.storeAcceptedAt,
+    this.storeRejectedAt,
     this.scoreDeliveryman = 5,
   });
 
@@ -31,6 +35,10 @@ class RequestModel {
   Store store;
   int notificationsDeliveryman;
   int payment;
+  int? preparationTimeMinutes;
+  DateTime? estimatedReadyAt;
+  DateTime? storeAcceptedAt;
+  DateTime? storeRejectedAt;
   double scoreDeliveryman;
 
   factory RequestModel.fromJson(Map<String, dynamic> json) => RequestModel(
@@ -48,6 +56,16 @@ class RequestModel {
         store: Store.fromJson(json["store"]),
         payment: json["payment"],
         notificationsDeliveryman: json["notificationsDeliveryman"],
+        preparationTimeMinutes: json["preparationTimeMinutes"],
+        estimatedReadyAt: json["estimatedReadyAt"] == null
+            ? null
+            : DateTime.parse(json["estimatedReadyAt"]),
+        storeAcceptedAt: json["storeAcceptedAt"] == null
+            ? null
+            : DateTime.parse(json["storeAcceptedAt"]),
+        storeRejectedAt: json["storeRejectedAt"] == null
+            ? null
+            : DateTime.parse(json["storeRejectedAt"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -64,6 +82,10 @@ class RequestModel {
         "store": store.toJson(),
         "payment": payment,
         "notificationsDeliveryman": notificationsDeliveryman,
+        "preparationTimeMinutes": preparationTimeMinutes,
+        "estimatedReadyAt": estimatedReadyAt?.toIso8601String(),
+        "storeAcceptedAt": storeAcceptedAt?.toIso8601String(),
+        "storeRejectedAt": storeRejectedAt?.toIso8601String(),
         "scoreDeliveryman": scoreDeliveryman,
       };
 }

@@ -12,6 +12,8 @@ class IconStatusOrder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (status) {
+      case StatusOrder.pendingStoreConfirmation:
+        return const Icon(Icons.pending_actions_outlined, color: kPrimaryColor);
       case StatusOrder.started:
         return const Icon(Icons.access_time_outlined, color: kSecondaryColor);
       case StatusOrder.assigned:
