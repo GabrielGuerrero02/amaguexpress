@@ -16,6 +16,10 @@ class PetitionModel {
     required this.store,
     required this.notificationsDeliveryman,
     required this.payment,
+    this.preparationTimeMinutes,
+    this.estimatedReadyAt,
+    this.storeAcceptedAt,
+    this.storeRejectedAt,
     this.scoreDeliveryman = 5,
   });
 
@@ -33,6 +37,10 @@ class PetitionModel {
   Store store;
   int notificationsDeliveryman;
   int payment;
+  int? preparationTimeMinutes;
+  DateTime? estimatedReadyAt;
+  DateTime? storeAcceptedAt;
+  DateTime? storeRejectedAt;
   double scoreDeliveryman;
 
   factory PetitionModel.fromJson(Map<String, dynamic> json) => PetitionModel(
@@ -50,6 +58,16 @@ class PetitionModel {
         user: User.fromJson(json["user"]),
         store: Store.fromJson(json["store"]),
         payment: json["payment"],
+        preparationTimeMinutes: json["preparationTimeMinutes"],
+        estimatedReadyAt: json["estimatedReadyAt"] == null
+            ? null
+            : DateTime.parse(json["estimatedReadyAt"]),
+        storeAcceptedAt: json["storeAcceptedAt"] == null
+            ? null
+            : DateTime.parse(json["storeAcceptedAt"]),
+        storeRejectedAt: json["storeRejectedAt"] == null
+            ? null
+            : DateTime.parse(json["storeRejectedAt"]),
         notificationsDeliveryman: json["notificationsDeliveryman"],
       );
 
@@ -68,6 +86,10 @@ class PetitionModel {
         "store": store.toJson(),
         "notificationsDeliveryman": notificationsDeliveryman,
         "payment": payment,
+        "preparationTimeMinutes": preparationTimeMinutes,
+        "estimatedReadyAt": estimatedReadyAt?.toIso8601String(),
+        "storeAcceptedAt": storeAcceptedAt?.toIso8601String(),
+        "storeRejectedAt": storeRejectedAt?.toIso8601String(),
         "scoreDeliveryman": scoreDeliveryman,
       };
 }

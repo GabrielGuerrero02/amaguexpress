@@ -12,6 +12,26 @@ class InfoPetitions extends StatelessWidget {
   final double height;
   final PetitionModel petition;
 
+  String? _timeLabel(DateTime now) {
+    final estimatedReadyAt = petition.estimatedReadyAt;
+    if (estimatedReadyAt != null) {
+      final remainingSeconds = estimatedReadyAt.difference(now).inSeconds;
+      final remainingPreparation =
+          remainingSeconds <= 0 ? 0 : ((remainingSeconds + 59) ~/ 60);
+
+      if (remainingPreparation <= 0) {
+        return '⏱ Pedido listo para recoger';
+      }
+
+      return '⏱ Ir a tienda en $remainingPreparation min aprox.';
+    }
+
+    final preparation = petition.preparationTimeMinutes;
+    if (preparation == null || preparation <= 0) return null;
+
+    return '⏱ Preparación indicada: $preparation min';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -27,6 +47,26 @@ class InfoPetitions extends StatelessWidget {
             Text(
               petition.store.address,
               style: const TextStyle(color: Colors.blueGrey, fontSize: 12.0),
+            ),
+            const SizedBox(height: 6.0),
+            StreamBuilder<int>(
+              stream: Stream<int>.periodic(
+                const Duration(minutes: 1),
+                (value) => value,
+              ),
+              initialData: 0,
+              builder: (context, _) {
+                final timeLabel = _timeLabel(DateTime.now());
+                if (timeLabel == null) return const SizedBox.shrink();
+
+                return Text(
+                  timeLabel,
+                  style: const TextStyle(
+                    color: Colors.blueGrey,
+                    fontSize: 12.0,
+                  ),
+                );
+              },
             ),
             Expanded(child: Container()),
             Row(

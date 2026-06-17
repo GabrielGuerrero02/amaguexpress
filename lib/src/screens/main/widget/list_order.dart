@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:amaguexpress/constants/constants.dart';
+import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/src/common/status_label.dart';
 import 'package:amaguexpress/src/models/order_model.dart';
 import 'package:amaguexpress/src/screens/order/order_screen.dart';
@@ -31,6 +32,33 @@ class _Order extends StatelessWidget {
     return _card(context);
   }
 
+  String? _timeLabel(DateTime now) {
+    if (order.status == StatusOrder.pendingStoreConfirmation) {
+      return '⏳ Esperando aprobación de la tienda';
+    }
+
+    const deliveryEstimate = 10;
+    final estimatedReadyAt = order.estimatedReadyAt;
+
+    if (estimatedReadyAt != null) {
+      final remainingSeconds = estimatedReadyAt.difference(now).inSeconds;
+      final remainingPreparation =
+          remainingSeconds <= 0 ? 0 : ((remainingSeconds + 59) ~/ 60);
+
+      if (remainingPreparation <= 0) {
+        return '⏱ Entrega estimada: $deliveryEstimate min aprox.';
+      }
+
+      final totalEstimate = remainingPreparation + deliveryEstimate;
+      return '⏱ Estimado: $totalEstimate min aprox.';
+    }
+
+    final preparation = order.preparationTimeMinutes;
+    if (preparation == null || preparation <= 0) return null;
+
+    return '⏱ Estimado: ${preparation + deliveryEstimate} min aprox.';
+  }
+
   Widget _card(BuildContext context) {
     final card = SizedBox(
       height: height,
@@ -53,6 +81,26 @@ class _Order extends StatelessWidget {
                       order.status,
                       order.store.company.type,
                     )),
+                    const SizedBox(height: 6),
+                    StreamBuilder<int>(
+                      stream: Stream<int>.periodic(
+                        const Duration(minutes: 1),
+                        (value) => value,
+                      ),
+                      initialData: 0,
+                      builder: (context, _) {
+                        final timeLabel = _timeLabel(DateTime.now());
+                        if (timeLabel == null) return const SizedBox.shrink();
+
+                        return Text(
+                          timeLabel,
+                          style: const TextStyle(
+                            color: Colors.blueGrey,
+                            fontSize: 12,
+                          ),
+                        );
+                      },
+                    ),
                     Expanded(child: Container()),
                     Row(
                       children: [

@@ -15,6 +15,10 @@ class OrderModel {
     required this.store,
     required this.notificationsClient,
     required this.payment,
+    this.preparationTimeMinutes,
+    this.estimatedReadyAt,
+    this.storeAcceptedAt,
+    this.storeRejectedAt,
     this.deliveryman,
     this.scoreClient = 5,
   });
@@ -32,6 +36,10 @@ class OrderModel {
   Store store;
   int notificationsClient;
   int payment;
+  int? preparationTimeMinutes;
+  DateTime? estimatedReadyAt;
+  DateTime? storeAcceptedAt;
+  DateTime? storeRejectedAt;
   Deliveryman? deliveryman;
   double scoreClient;
 
@@ -50,6 +58,16 @@ class OrderModel {
         store: Store.fromJson(json["store"]),
         notificationsClient: json["notificationsClient"],
         payment: json["payment"],
+        preparationTimeMinutes: json["preparationTimeMinutes"],
+        estimatedReadyAt: json["estimatedReadyAt"] == null
+            ? null
+            : DateTime.parse(json["estimatedReadyAt"]),
+        storeAcceptedAt: json["storeAcceptedAt"] == null
+            ? null
+            : DateTime.parse(json["storeAcceptedAt"]),
+        storeRejectedAt: json["storeRejectedAt"] == null
+            ? null
+            : DateTime.parse(json["storeRejectedAt"]),
         deliveryman: json["deliveryman"] == null
             ? Deliveryman(
                 id: 0, fullName: kNameApp, image: kImageDeliveryManDefault)
@@ -70,6 +88,10 @@ class OrderModel {
         "notificationsClient": notificationsClient,
         "store": store.toJson(),
         "payment": payment,
+        "preparationTimeMinutes": preparationTimeMinutes,
+        "estimatedReadyAt": estimatedReadyAt?.toIso8601String(),
+        "storeAcceptedAt": storeAcceptedAt?.toIso8601String(),
+        "storeRejectedAt": storeRejectedAt?.toIso8601String(),
         "deliveryman": deliveryman != null ? deliveryman!.toJson() : null,
         "scoreClient": scoreClient,
       };
