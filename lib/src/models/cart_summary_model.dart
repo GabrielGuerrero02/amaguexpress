@@ -26,7 +26,7 @@ class CartSummaryModel {
         "store": {"id": fee.storeId},
         "note": address.alias.trim(),
         "address": address.address.trim(),
-        "products": List<dynamic>.from(products.map((x) => x.toJson())),
+        "products": List<dynamic>.from(products.map((x) => x.toBuyJson())),
         "start": Location(x: fee.fromlt, y: fee.fromlg).toJson(),
         "location": address.location.toJson(), //Destination
         "total": double.parse(total.toStringAsFixed(kCoinDecimals)),

@@ -64,4 +64,15 @@ class ProductModel {
         "total": double.parse(total.toStringAsFixed(kCoinDecimals)),
         "note": note,
       };
+
+  Map<String, dynamic> toBuyJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+        "price": price,
+        "image": image,
+        "number": number,
+        "total": double.parse(total.toStringAsFixed(kCoinDecimals)),
+        "note": note,
+      };
 }
