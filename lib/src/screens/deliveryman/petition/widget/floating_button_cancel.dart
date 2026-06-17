@@ -20,7 +20,7 @@ class FloatingButtonCancel extends StatelessWidget {
   Widget build(BuildContext context) {
     return petitionController.petition.status == StatusOrder.assigned
         ? Positioned(
-            top: 280,
+            top: 180,
             right: kDefaultPadding,
             child: CircularButton(
               icon: const Icon(Icons.cancel_outlined,
