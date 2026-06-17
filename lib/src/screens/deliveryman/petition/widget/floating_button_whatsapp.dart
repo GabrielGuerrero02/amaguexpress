@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:amaguexpress/constants/constants.dart';
-import 'package:amaguexpress/constants/status_constant.dart';
-import 'package:amaguexpress/src/common/launch.dart';
 import 'package:amaguexpress/src/models/petition_model.dart';
-import 'package:amaguexpress/src/widgets/circular_button.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class FloatingButtonWhatsapp extends StatelessWidget {
   const FloatingButtonWhatsapp({
@@ -16,30 +11,6 @@ class FloatingButtonWhatsapp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return petition.status == StatusOrder.assigned
-        ? Positioned(
-            top: 120,
-            right: kDefaultPadding,
-            child: CircularButton(
-              icon: const SizedBox(
-                width: 44,
-                height: 44,
-                child: Center(
-                  child: FaIcon(
-                    FontAwesomeIcons.whatsapp,
-                    color: kPrimaryColor,
-                    size: 34,
-                  ),
-                ),
-              ),
-              onPressed: () {
-                sendWhatsapp(
-                  petition.store.contact,
-                  '${petition.user.fullName}\n${petition.products.join('\n')}',
-                );
-              },
-            ),
-          )
-        : Container();
+    return const SizedBox.shrink();
   }
 }

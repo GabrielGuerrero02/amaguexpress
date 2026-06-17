@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:amaguexpress/constants/constants.dart';
+import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/src/common/launch.dart';
 import 'package:amaguexpress/src/models/petition_model.dart';
 import 'package:amaguexpress/src/widgets/circular_button.dart';
@@ -14,6 +15,11 @@ class FloatingButtonCall extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canCallStore = petition.status >= StatusOrder.assigned &&
+        petition.status <= StatusOrder.taken;
+
+    if (!canCallStore) return Container();
+
     return Positioned(
       top: 200,
       right: kDefaultPadding,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:amaguexpress/constants/constants.dart';
+import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/generated/l10n.dart';
 import 'package:amaguexpress/src/common/launch.dart';
 import 'package:amaguexpress/src/screens/manager/request/request_controller.dart';
@@ -18,6 +19,10 @@ class FloatingHead extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final canCallClient =
+        requestController.request.status >= StatusOrder.started &&
+            requestController.request.status <= StatusOrder.taken;
+
     return Align(
       alignment: Alignment.topCenter,
       child: Container(
@@ -64,13 +69,14 @@ class FloatingHead extends StatelessWidget {
                 ],
               ),
             ),
-            CircularButton(
-              icon: const Icon(Icons.call_outlined,
-                  color: kPrimaryColor, size: 40),
-              onPressed: () {
-                call(requestController.request.user.phone);
-              },
-            )
+            if (canCallClient)
+              CircularButton(
+                icon: const Icon(Icons.call_outlined,
+                    color: kPrimaryColor, size: 40),
+                onPressed: () {
+                  call(requestController.request.user.phone);
+                },
+              )
           ],
         ),
       ),
