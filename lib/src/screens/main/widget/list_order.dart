@@ -34,7 +34,7 @@ class _Order extends StatelessWidget {
 
   String? _timeLabel(DateTime now) {
     if (order.status == StatusOrder.pendingStoreConfirmation) {
-      return '⏳ Esperando aprobación de la tienda';
+      return '⏳ Esperando tienda';
     }
 
     const deliveryEstimate = 10;
@@ -46,17 +46,17 @@ class _Order extends StatelessWidget {
           remainingSeconds <= 0 ? 0 : ((remainingSeconds + 59) ~/ 60);
 
       if (remainingPreparation <= 0) {
-        return '⏱ Entrega estimada: $deliveryEstimate min aprox.';
+        return '⏱ Entrega: $deliveryEstimate min';
       }
 
       final totalEstimate = remainingPreparation + deliveryEstimate;
-      return '⏱ Estimado: $totalEstimate min aprox.';
+      return '⏱ Estimado: $totalEstimate min';
     }
 
     final preparation = order.preparationTimeMinutes;
     if (preparation == null || preparation <= 0) return null;
 
-    return '⏱ Estimado: ${preparation + deliveryEstimate} min aprox.';
+    return '⏱ Estimado: ${preparation + deliveryEstimate} min';
   }
 
   Widget _card(BuildContext context) {
@@ -94,6 +94,8 @@ class _Order extends StatelessWidget {
 
                         return Text(
                           timeLabel,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: Colors.blueGrey,
                             fontSize: 12,

@@ -15,7 +15,7 @@ class InfoRequests extends StatelessWidget {
 
   String? _timeLabel(DateTime now) {
     if (request.status == StatusOrder.pendingStoreConfirmation) {
-      return '⏳ Pendiente de aprobación';
+      return '⏳ Pendiente';
     }
 
     final estimatedReadyAt = request.estimatedReadyAt;
@@ -66,6 +66,8 @@ class InfoRequests extends StatelessWidget {
 
                 return Text(
                   timeLabel,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.blueGrey,
                     fontSize: 12.0,

@@ -23,13 +23,13 @@ class InfoPetitions extends StatelessWidget {
         return '⏱ Pedido listo para recoger';
       }
 
-      return '⏱ Ir a tienda en $remainingPreparation min aprox.';
+      return '⏱ Ir a tienda en $remainingPreparation min';
     }
 
     final preparation = petition.preparationTimeMinutes;
     if (preparation == null || preparation <= 0) return null;
 
-    return '⏱ Preparación indicada: $preparation min';
+    return '⏱ Preparación: $preparation min';
   }
 
   @override
@@ -61,6 +61,8 @@ class InfoPetitions extends StatelessWidget {
 
                 return Text(
                   timeLabel,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: Colors.blueGrey,
                     fontSize: 12.0,
