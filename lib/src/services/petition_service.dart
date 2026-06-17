@@ -29,6 +29,7 @@ class PetitionService {
         },
       );
       if (resp.statusCode != 200) return petition;
+      if (resp.body.trim().isEmpty) return petition;
       Map<String, dynamic> decodedResp = json.decode(resp.body);
       return PetitionModel.fromJson(decodedResp['petition']);
     } catch (err) {
@@ -52,6 +53,7 @@ class PetitionService {
         },
       );
       if (resp.statusCode != 200) return petitions;
+      if (resp.body.trim().isEmpty) return petitions;
       Map<String, dynamic> decodedResp = json.decode(resp.body);
       for (var item in decodedResp['petitions']) {
         petitions.add(PetitionModel.fromJson(item));
@@ -77,6 +79,7 @@ class PetitionService {
         },
       );
       if (resp.statusCode != 200) return petitions;
+      if (resp.body.trim().isEmpty) return petitions;
       Map<String, dynamic> decodedResp = json.decode(resp.body);
       for (var item in decodedResp['petitions']) {
         petitions.add(PetitionModel.fromJson(item));
@@ -100,6 +103,7 @@ class PetitionService {
         'Content-Type': 'application/json; charset=UTF-8',
       });
       if (resp.statusCode != 200) return petition;
+      if (resp.body.trim().isEmpty) return petition;
       Map<String, dynamic> decodedResp = json.decode(resp.body);
       return PetitionModel.fromJson(decodedResp['petition']);
     } catch (err) {
@@ -143,6 +147,7 @@ class PetitionService {
         'Content-Type': 'application/json; charset=UTF-8',
       });
       if (resp.statusCode != 200) return petition;
+      if (resp.body.trim().isEmpty) return petition;
       Map<String, dynamic> decodedResp = json.decode(resp.body);
       return PetitionModel.fromJson(decodedResp['petition']);
     } catch (err) {
@@ -163,6 +168,7 @@ class PetitionService {
         'Authorization': 'Bearer ${prefs.token}',
         'Content-Type': 'application/json; charset=UTF-8',
       });
+      if (resp.body.trim().isEmpty) return null;
       return json.decode(resp.body);
     } catch (err) {
       if (kDebugMode) {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:amaguexpress/src/models/request_model.dart';
+import 'package:amaguexpress/src/screens/manager/requests/requests_controller.dart';
 import 'package:amaguexpress/src/screens/manager/request/request_screen.dart';
 import 'package:amaguexpress/src/screens/manager/requests/widget/info_requests.dart';
 import 'package:amaguexpress/src/widgets/avatar_image.dart';
@@ -50,12 +52,17 @@ class _Request extends StatelessWidget {
             child: InkWell(
                 splashColor: Colors.blueAccent.withValues(alpha: (0.6 * 255)),
                 onTap: () async {
-                  Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => RequestScreen(request),
                     ),
                   );
+
+                  if (!context.mounted) return;
+
+                  Provider.of<RequestsController>(context, listen: false)
+                      .loadRequests();
                 }),
           ),
         ),
