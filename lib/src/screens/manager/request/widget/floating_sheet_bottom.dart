@@ -105,11 +105,85 @@ class FloatingSheetBottom extends StatelessWidget {
               if (requestController.request.status ==
                   StatusOrder.pendingStoreConfirmation)
                 const SizedBox(height: 12),
+              if (requestController.request.status !=
+                  StatusOrder.pendingStoreConfirmation) ...[
+                _StoreDetailTimeInfo(
+                  preparationTimeMinutes:
+                      requestController.request.preparationTimeMinutes,
+                  estimatedReadyAt: requestController.request.estimatedReadyAt,
+                ),
+                const SizedBox(height: 10),
+              ],
               DetailsProducts(request: requestController.request),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StoreDetailTimeInfo extends StatelessWidget {
+  final int? preparationTimeMinutes;
+  final DateTime? estimatedReadyAt;
+
+  const _StoreDetailTimeInfo({
+    required this.preparationTimeMinutes,
+    required this.estimatedReadyAt,
+  });
+
+  String? _timeLabel(DateTime now) {
+    if (estimatedReadyAt != null) {
+      final remainingSeconds = estimatedReadyAt!.difference(now).inSeconds;
+      final remainingPreparation =
+          remainingSeconds <= 0 ? 0 : ((remainingSeconds + 59) ~/ 60);
+
+      if (remainingPreparation <= 0) {
+        return '⏱ Pedido debería estar listo';
+      }
+
+      return '⏱ Listo en $remainingPreparation min';
+    }
+
+    if (preparationTimeMinutes == null || preparationTimeMinutes! <= 0) {
+      return null;
+    }
+
+    return '⏱ Preparación: $preparationTimeMinutes min';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return StreamBuilder<int>(
+      stream: Stream<int>.periodic(
+        const Duration(minutes: 1),
+        (value) => value,
+      ),
+      initialData: 0,
+      builder: (context, _) {
+        final label = _timeLabel(DateTime.now());
+        if (label == null) return const SizedBox.shrink();
+
+        return Row(
+          children: [
+            const Icon(Icons.schedule_outlined, size: 18, color: kPrimaryColor),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: cs.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

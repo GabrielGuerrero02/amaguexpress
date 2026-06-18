@@ -134,11 +134,91 @@ class FloatingSheetBottom extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
+              _OrderDetailTimeInfo(
+                status: orderController.order.status,
+                preparationTimeMinutes:
+                    orderController.order.preparationTimeMinutes,
+                estimatedReadyAt: orderController.order.estimatedReadyAt,
+              ),
+              const SizedBox(height: 10),
               InfoProduct(order: orderController.order),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _OrderDetailTimeInfo extends StatelessWidget {
+  final int status;
+  final int? preparationTimeMinutes;
+  final DateTime? estimatedReadyAt;
+
+  const _OrderDetailTimeInfo({
+    required this.status,
+    required this.preparationTimeMinutes,
+    required this.estimatedReadyAt,
+  });
+
+  String? _timeLabel(DateTime now) {
+    if (status == StatusOrder.pendingStoreConfirmation) {
+      return '⏳ Esperando aprobación de la tienda';
+    }
+
+    const deliveryEstimate = 10;
+
+    if (estimatedReadyAt != null) {
+      final remainingSeconds = estimatedReadyAt!.difference(now).inSeconds;
+      final remainingPreparation =
+          remainingSeconds <= 0 ? 0 : ((remainingSeconds + 59) ~/ 60);
+
+      if (remainingPreparation <= 0) {
+        return '⏱ Entrega estimada: $deliveryEstimate min';
+      }
+
+      return '⏱ Entrega estimada: ${remainingPreparation + deliveryEstimate} min';
+    }
+
+    if (preparationTimeMinutes == null || preparationTimeMinutes! <= 0) {
+      return null;
+    }
+
+    return '⏱ Entrega estimada: ${preparationTimeMinutes! + deliveryEstimate} min';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return StreamBuilder<int>(
+      stream: Stream<int>.periodic(
+        const Duration(minutes: 1),
+        (value) => value,
+      ),
+      initialData: 0,
+      builder: (context, _) {
+        final label = _timeLabel(DateTime.now());
+        if (label == null) return const SizedBox.shrink();
+
+        return Row(
+          children: [
+            const Icon(Icons.schedule_outlined, size: 18, color: kPrimaryColor),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: cs.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
