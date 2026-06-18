@@ -162,6 +162,10 @@ class _OrderDetailTimeInfo extends StatelessWidget {
   });
 
   String? _timeLabel(DateTime now) {
+    if (status == StatusOrder.cancelled) {
+      return null;
+    }
+
     if (status == StatusOrder.pendingStoreConfirmation) {
       return '⏳ Esperando aprobación de la tienda';
     }
@@ -174,7 +178,7 @@ class _OrderDetailTimeInfo extends StatelessWidget {
           remainingSeconds <= 0 ? 0 : ((remainingSeconds + 59) ~/ 60);
 
       if (remainingPreparation <= 0) {
-        return '⏱ Entrega estimada: $deliveryEstimate min';
+        return '⏱ Pedido listo. Entrega en curso';
       }
 
       return '⏱ Entrega estimada: ${remainingPreparation + deliveryEstimate} min';

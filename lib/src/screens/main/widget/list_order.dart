@@ -23,7 +23,7 @@ class ListOrder extends StatelessWidget {
 
 class _Order extends StatelessWidget {
   final OrderModel order;
-  final double height = 150;
+  final double height = 165;
 
   const _Order(this.order);
 
@@ -33,6 +33,10 @@ class _Order extends StatelessWidget {
   }
 
   String? _timeLabel(DateTime now) {
+    if (order.status == StatusOrder.cancelled) {
+      return null;
+    }
+
     if (order.status == StatusOrder.pendingStoreConfirmation) {
       return '⏳ Esperando tienda';
     }
@@ -46,7 +50,7 @@ class _Order extends StatelessWidget {
           remainingSeconds <= 0 ? 0 : ((remainingSeconds + 59) ~/ 60);
 
       if (remainingPreparation <= 0) {
-        return '⏱ Entrega: $deliveryEstimate min';
+        return '⏱ Pedido listo, entrega en curso';
       }
 
       final totalEstimate = remainingPreparation + deliveryEstimate;
@@ -76,11 +80,17 @@ class _Order extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const SizedBox(height: 30.0),
-                    Text(statusOrderLabel(
-                      order.status,
-                      order.store.company.type,
-                    )),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      order.status == StatusOrder.cancelled
+                          ? 'Pedido cancelado'
+                          : statusOrderLabel(
+                              order.status,
+                              order.store.company.type,
+                            ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 6),
                     StreamBuilder<int>(
                       stream: Stream<int>.periodic(
