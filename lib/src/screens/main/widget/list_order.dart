@@ -72,7 +72,18 @@ class _Order extends StatelessWidget {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         child: Row(
           children: <Widget>[
-            AvatarImage(image: order.store.company.image),
+            SizedBox(
+              width: 165,
+              height: height,
+              child: Center(
+                child: AvatarImage(
+                  image: order.store.company.image,
+                  width: 135,
+                  height: 135,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
             Expanded(
               child: Container(
                 height: height,

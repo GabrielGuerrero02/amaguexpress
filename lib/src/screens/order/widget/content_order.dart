@@ -12,6 +12,7 @@ import 'package:amaguexpress/src/screens/main/tab_main_controller.dart';
 import 'package:amaguexpress/src/screens/order/order_controller.dart';
 import 'package:amaguexpress/src/screens/order/widget/floating_head.dart';
 import 'package:amaguexpress/src/screens/order/widget/floating_sheet_bottom.dart';
+import 'package:amaguexpress/src/services/market_service.dart';
 import 'package:amaguexpress/src/widgets/primary_button.dart';
 import 'package:provider/provider.dart';
 
@@ -201,7 +202,7 @@ class _CancelledOrderDialogState extends State<CancelledOrderDialog> {
   Widget build(BuildContext context) {
     if (!_shown) {
       _shown = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -211,10 +212,15 @@ class _CancelledOrderDialogState extends State<CancelledOrderDialog> {
           ),
         );
 
+        final orderId = widget.orderController.order.id;
+        await MarketService().markCancelledSeen(orderId);
+
+        if (!mounted) return;
+
         Provider.of<Tab1Controller>(context, listen: false).load();
         final tab2Controller =
             Provider.of<Tab2Controller>(context, listen: false);
-        tab2Controller.hideCancelledOrder(widget.orderController.order.id);
+        tab2Controller.hideCancelledOrder(orderId);
         Provider.of<TabManController>(context, listen: false).currentScreen = 0;
         Navigator.of(context).popUntil((route) => route.isFirst);
       });

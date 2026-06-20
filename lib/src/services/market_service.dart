@@ -65,6 +65,32 @@ class MarketService {
     return orders;
   }
 
+  Future<bool> markCancelledSeen(int orderId) async {
+    final client = http.Client();
+    try {
+      final resp = await client.patch(
+        Uri.parse('$kDomain$_urlOrder$orderId/cancel-seen'),
+        headers: {'Authorization': 'Bearer ${prefs.token}'},
+      );
+
+      if (kDebugMode) {
+        print('[MarketService] markCancelledSeen -> status=${resp.statusCode}');
+        if (resp.statusCode != 200) {
+          print('[MarketService] markCancelledSeen -> body=${resp.body}');
+        }
+      }
+
+      return resp.statusCode == 200;
+    } catch (err) {
+      if (kDebugMode) {
+        print('MarketService markCancelledSeen: $err');
+      }
+      return false;
+    } finally {
+      client.close();
+    }
+  }
+
   Future<OrderModel> getOrder(OrderModel order) async {
     final client = http.Client();
     try {
