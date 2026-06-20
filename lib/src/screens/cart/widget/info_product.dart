@@ -33,10 +33,17 @@ class InfoProduct extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 5.0),
-            Text(product.name),
+            Text(
+              product.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 5.0),
             Text(
               product.description,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: Colors.blueGrey),
             ),
             Expanded(child: Container()),

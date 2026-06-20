@@ -34,6 +34,8 @@ class CartProduct extends StatelessWidget {
                   ),
                   Text(
                     product.companyName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style:
                         const TextStyle(fontSize: 11, color: Colors.blueGrey),
                   ),
