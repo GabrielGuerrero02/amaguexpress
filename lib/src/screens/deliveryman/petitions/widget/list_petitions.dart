@@ -4,7 +4,7 @@ import 'package:amaguexpress/src/models/petition_model.dart';
 import 'package:amaguexpress/src/screens/deliveryman/petition/petition_screen.dart';
 import 'package:amaguexpress/src/screens/deliveryman/petitions/widget/info_petitions.dart';
 import 'package:amaguexpress/src/screens/deliveryman/petitions/widget/slider_apply.dart';
-import 'package:amaguexpress/src/widgets/avatar_image.dart';
+import 'package:amaguexpress/src/widgets/order_company_logo.dart';
 import 'package:amaguexpress/src/widgets/card_notifications_icon.dart';
 
 class ListPetitions extends StatelessWidget {
@@ -37,7 +37,10 @@ class _Petition extends StatelessWidget {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         child: Row(
           children: <Widget>[
-            AvatarImage(image: petition.store.company.image),
+            OrderCompanyLogo(
+              image: petition.store.company.image,
+              height: height,
+            ),
             InfoPetitions(height: height, petition: petition),
           ],
         ),

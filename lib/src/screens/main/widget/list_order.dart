@@ -4,7 +4,7 @@ import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/src/common/status_label.dart';
 import 'package:amaguexpress/src/models/order_model.dart';
 import 'package:amaguexpress/src/screens/order/order_screen.dart';
-import 'package:amaguexpress/src/widgets/avatar_image.dart';
+import 'package:amaguexpress/src/widgets/order_company_logo.dart';
 import 'package:amaguexpress/src/widgets/card_notifications_icon.dart';
 
 class ListOrder extends StatelessWidget {
@@ -72,17 +72,9 @@ class _Order extends StatelessWidget {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         child: Row(
           children: <Widget>[
-            SizedBox(
-              width: 165,
+            OrderCompanyLogo(
+              image: order.store.company.image,
               height: height,
-              child: Center(
-                child: AvatarImage(
-                  image: order.store.company.image,
-                  width: 135,
-                  height: 135,
-                  fit: BoxFit.contain,
-                ),
-              ),
             ),
             Expanded(
               child: Container(

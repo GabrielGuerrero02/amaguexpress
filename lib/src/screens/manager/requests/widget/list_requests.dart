@@ -4,7 +4,7 @@ import 'package:amaguexpress/src/models/request_model.dart';
 import 'package:amaguexpress/src/screens/manager/requests/requests_controller.dart';
 import 'package:amaguexpress/src/screens/manager/request/request_screen.dart';
 import 'package:amaguexpress/src/screens/manager/requests/widget/info_requests.dart';
-import 'package:amaguexpress/src/widgets/avatar_image.dart';
+import 'package:amaguexpress/src/widgets/order_company_logo.dart';
 import 'package:amaguexpress/src/widgets/card_notifications_icon.dart';
 
 class ListRequests extends StatelessWidget {
@@ -37,7 +37,10 @@ class _Request extends StatelessWidget {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         child: Row(
           children: <Widget>[
-            AvatarImage(image: request.store.company.image),
+            OrderCompanyLogo(
+              image: request.store.company.image,
+              height: height,
+            ),
             InfoRequests(height: height, request: request),
           ],
         ),
