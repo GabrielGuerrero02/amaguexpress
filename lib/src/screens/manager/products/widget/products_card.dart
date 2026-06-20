@@ -19,27 +19,72 @@ class ProductsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(kDefaultPadding),
-      child: Column(
-        children: [
-          ListTile(
-            onTap: () {
-              final productController =
-                  Provider.of<ProductController>(context, listen: false);
-              productController.companyProduct = companyProduct;
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => ProductScreen(productsController),
+    final isVisible = companyProduct.isVisible;
+
+    return Opacity(
+      opacity: isVisible ? 1.0 : 0.45,
+      child: Container(
+        padding: const EdgeInsets.all(kDefaultPadding),
+        child: Column(
+          children: [
+            ListTile(
+              onTap: () {
+                final productController =
+                    Provider.of<ProductController>(context, listen: false);
+                productController.companyProduct = companyProduct;
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ProductScreen(productsController),
+                  ),
+                );
+              },
+              leading: AvatarImage(
+                image: companyProduct.image,
+                width: 56,
+                height: 56,
+              ),
+              title: Text(
+                companyProduct.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                companyProduct.description,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: IconButton(
+                tooltip: isVisible ? 'Ocultar producto' : 'Mostrar producto',
+                icon: Icon(
+                  isVisible
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: isVisible ? kPrimaryColor : Colors.blueGrey,
                 ),
-              );
-            },
-            leading: AvatarImage(image: companyProduct.image),
-            title: Text(companyProduct.name),
-            subtitle: Text(companyProduct.description),
-          ),
-          const Divider(color: kPrimaryColor, thickness: 1)
-        ],
+                onPressed: () async {
+                  final ok = await productsController
+                      .toggleProductVisibility(companyProduct);
+
+                  if (!context.mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text(
+                        ok
+                            ? (isVisible
+                                ? 'Producto ocultado'
+                                : 'Producto visible')
+                            : 'No se pudo actualizar el producto',
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const Divider(color: kPrimaryColor, thickness: 1)
+          ],
+        ),
       ),
     );
   }
