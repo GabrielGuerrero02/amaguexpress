@@ -58,7 +58,6 @@ class CompanyProductModel {
         "image": image.trim(),
         "type": type,
         "price": price,
-        "isVisible": isVisible,
         "company": {"id": companyId},
         "group": {"id": group!.id}
       });
@@ -69,7 +68,6 @@ class CompanyProductModel {
         "image": image.trim(),
         "type": type,
         "price": price,
-        "isVisible": isVisible,
         "group": {"id": group!.id}
       });
 }

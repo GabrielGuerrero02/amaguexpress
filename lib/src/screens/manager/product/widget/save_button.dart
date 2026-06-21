@@ -45,7 +45,7 @@ class SaveButton extends StatelessWidget {
         if (companyProduct == null) {
           scaffoldMessenger.showSnackBar(SnackBar(
             backgroundColor: kErrorColor,
-            content: Text(s.errUnknown),
+            content: Text(productController.lastErrorMessage ?? s.errUnknown),
           ));
           return;
         }

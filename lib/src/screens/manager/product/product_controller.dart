@@ -18,6 +18,8 @@ class ProductController extends ChangeNotifier {
 
   bool get inAsyncCall => _inAsyncCall;
 
+  String? get lastErrorMessage => storeManagerService.lastErrorMessage;
+
   set inAsyncCall(bool asyncCall) {
     _inAsyncCall = asyncCall;
     notifyListeners();

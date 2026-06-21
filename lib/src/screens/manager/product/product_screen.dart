@@ -59,7 +59,7 @@ class ProductScreen extends StatelessWidget {
                                 String imageUpload = await uploadFile(
                                     image,
                                     'product/${productsController.storeCompany.company.id}',
-                                    '${productsController.storeCompany.company.id}-${DateTime.now().toIso8601String()}',
+                                    '${productsController.storeCompany.company.id}-${DateTime.now().millisecondsSinceEpoch}.jpg',
                                     kTargetWidthProduct);
                                 productController.companyProduct.image =
                                     imageUpload;

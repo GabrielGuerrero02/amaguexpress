@@ -62,15 +62,40 @@ Future<String> uploadFile(
   String name,
   int targetWidth,
 ) async {
-  firebase_storage.Reference storageReference =
-      firebase_storage.FirebaseStorage.instance.ref(folder).child(name);
+  final safeName = name.replaceAll(RegExp(r'[^A-Za-z0-9_.-]'), '_');
+
+  final firebase_storage.Reference storageReference =
+      firebase_storage.FirebaseStorage.instance.ref(folder).child(safeName);
 
   try {
+    if (kDebugMode) {
+      print('[FirebaseStorage] uploadFile -> folder=$folder');
+      print('[FirebaseStorage] uploadFile -> name=$safeName');
+      print('[FirebaseStorage] uploadFile -> file=${file.path}');
+      print('[FirebaseStorage] uploadFile -> targetWidth=$targetWidth');
+    }
+
     // Si targetWidth es mayor a 0, procesamos la imagen
     if (targetWidth > 0) {
       final originalBytes = await file.readAsBytes();
+
+      if (kDebugMode) {
+        print(
+            '[FirebaseStorage] uploadFile -> originalBytes=${originalBytes.length}');
+      }
+
       final decoded = img.decodeImage(originalBytes);
-      if (decoded == null) return '';
+      if (decoded == null) {
+        if (kDebugMode) {
+          print('[FirebaseStorage] uploadFile -> decodeImage returned null');
+        }
+        return '';
+      }
+
+      if (kDebugMode) {
+        print(
+            '[FirebaseStorage] uploadFile -> decoded=${decoded.width}x${decoded.height}');
+      }
 
       // Hacemos crop a cuadrado (desde el centro)
       final minSide =
@@ -92,27 +117,56 @@ Future<String> uploadFile(
       // Guardamos la imagen en formato JPG
       final compressedBytes = img.encodeJpg(resized, quality: 85);
 
-      // Guardamos temporalmente para subir
-      final tmpPath = '${file.parent.path}/${name}_compressed.jpg';
-      final compressedFile = await File(tmpPath).writeAsBytes(compressedBytes);
+      if (kDebugMode) {
+        print(
+            '[FirebaseStorage] uploadFile -> compressedBytes=${compressedBytes.length}');
+        print('[FirebaseStorage] uploadFile -> putData start');
+      }
 
-      final firebase_storage.UploadTask uploadTask =
-          storageReference.putFile(compressedFile);
+      final metadata = firebase_storage.SettableMetadata(
+        contentType: 'image/jpeg',
+      );
+
+      final firebase_storage.UploadTask uploadTask = storageReference.putData(
+        Uint8List.fromList(compressedBytes),
+        metadata,
+      );
       await uploadTask.whenComplete(() => null);
+
+      if (kDebugMode) {
+        print('[FirebaseStorage] uploadFile -> putData done');
+      }
     } else {
-      // Otros tipos de archivos, se suben tal como están
+      if (kDebugMode) {
+        print('[FirebaseStorage] uploadFile -> putFile original start');
+      }
+
       final firebase_storage.UploadTask uploadTask =
           storageReference.putFile(file);
       await uploadTask.whenComplete(() => null);
+
+      if (kDebugMode) {
+        print('[FirebaseStorage] uploadFile -> putFile original done');
+      }
     }
-  } catch (e) {
+
     if (kDebugMode) {
-      // ignore: avoid_print
-      print(e);
+      print('[FirebaseStorage] uploadFile -> getDownloadURL start');
+    }
+
+    final String url = await storageReference.getDownloadURL();
+
+    if (kDebugMode) {
+      print('[FirebaseStorage] uploadFile -> getDownloadURL done');
+      print('[FirebaseStorage] uploadFile -> url=$url');
+    }
+
+    return '${url.split('?alt=media&token=')[0]}?alt=media';
+  } catch (e, stackTrace) {
+    if (kDebugMode) {
+      print('[FirebaseStorage] uploadFile ERROR: $e');
+      print('[FirebaseStorage] uploadFile STACK: $stackTrace');
     }
     return '';
   }
-
-  final String url = await storageReference.getDownloadURL();
-  return '${url.split('?alt=media&token=')[0]}?alt=media';
 }

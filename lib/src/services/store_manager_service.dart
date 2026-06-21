@@ -20,6 +20,23 @@ const _urlManualOffline = 'manager/store';
 class StoreManagerService {
   final prefs = PreferencesProvider();
 
+  String? lastErrorMessage;
+
+  String? _extractErrorMessage(String body) {
+    try {
+      final decoded = json.decode(body);
+      if (decoded is! Map<String, dynamic>) return null;
+
+      final message = decoded['message'];
+      if (message is String) return message;
+      if (message is List) return message.join('\n');
+
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<HourModel> updateHour(HourModel hour) async {
     var client = http.Client();
     try {
@@ -115,6 +132,7 @@ class StoreManagerService {
 
   Future<CompanyProductModel?> createProduct(
       CompanyProductModel companyProduct, int companyId) async {
+    lastErrorMessage = null;
     var client = http.Client();
     try {
       final resp = await client.post(Uri.parse('$kDomain$_urlCreateProduct'),
@@ -123,7 +141,19 @@ class StoreManagerService {
             'Content-Type': 'application/json; charset=UTF-8',
           },
           body: companyProduct.toHttpBodyCreate(companyId));
-      if (resp.statusCode != 201) return null;
+      if (resp.statusCode != 201) {
+        lastErrorMessage =
+            _extractErrorMessage(resp.body) ?? 'No se pudo crear el producto';
+
+        if (kDebugMode) {
+          print(
+              '[StoreManagerService] createProduct -> status=${resp.statusCode}');
+          print('[StoreManagerService] createProduct -> body=${resp.body}');
+          print(
+              '[StoreManagerService] createProduct -> message=$lastErrorMessage');
+        }
+        return null;
+      }
       Map<String, dynamic> decodedResp = json.decode(resp.body);
       return CompanyProductModel.fromJson(decodedResp['product']);
     } catch (err) {
@@ -138,6 +168,7 @@ class StoreManagerService {
 
   Future<CompanyProductModel?> updateProduct(
       CompanyProductModel companyProduct) async {
+    lastErrorMessage = null;
     var client = http.Client();
     try {
       final resp = await client.patch(
@@ -147,7 +178,17 @@ class StoreManagerService {
             'Content-Type': 'application/json; charset=UTF-8',
           },
           body: companyProduct.toHttpBodyUpdate());
-      if (resp.statusCode != 200) return null;
+      if (resp.statusCode != 200) {
+        lastErrorMessage = _extractErrorMessage(resp.body) ??
+            'No se pudo actualizar el producto';
+
+        if (kDebugMode) {
+          print(
+              '[StoreManagerService] updateProduct -> status=${resp.statusCode}');
+          print('[StoreManagerService] updateProduct -> body=${resp.body}');
+        }
+        return null;
+      }
       Map<String, dynamic> decodedResp = json.decode(resp.body);
       return CompanyProductModel.fromJson(decodedResp['product']);
     } catch (err) {
