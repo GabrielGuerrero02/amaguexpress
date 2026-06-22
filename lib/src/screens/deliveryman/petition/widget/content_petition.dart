@@ -119,7 +119,8 @@ class _ContentPetitionState extends State<ContentPetition>
             FloatingHead(petitionController: widget.petitionController),
             FloatingButtonCall(petition: widget.petitionController.petition),
             FloatingButtonWhatsapp(
-                petition: widget.petitionController.petition),
+              petitionController: widget.petitionController,
+            ),
             FloatingButtonCancel(petitionController: widget.petitionController),
             FloatingSheetBottom(petitionController: widget.petitionController),
           ],

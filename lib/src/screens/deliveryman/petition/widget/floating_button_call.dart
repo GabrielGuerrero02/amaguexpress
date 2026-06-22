@@ -26,7 +26,7 @@ class FloatingButtonCall extends StatelessWidget {
       child: CircularButton(
         icon: const Icon(Icons.call_outlined, color: kPrimaryColor, size: 40),
         onPressed: () {
-          call(petition.store.contact);
+          call(petition.user.phone);
         },
       ),
     );

@@ -52,7 +52,7 @@ class FloatingSheetBottom extends StatelessWidget {
                 children: <Widget>[
                   SizedBox(
                     width: 80,
-                    child: _chatClient(context),
+                    child: _chatStore(context),
                   ),
                   Container(
                     padding: const EdgeInsets.all(6),
@@ -84,7 +84,7 @@ class FloatingSheetBottom extends StatelessWidget {
                   ),
                   SizedBox(
                     width: 80,
-                    child: _callClient(context),
+                    child: _callStore(context),
                   ),
                 ],
               ),
@@ -176,18 +176,18 @@ class FloatingSheetBottom extends StatelessWidget {
     );
   }
 
-  Widget _callClient(BuildContext context) {
+  Widget _callStore(BuildContext context) {
     if (petitionController.petition.status >= StatusOrder.assigned &&
         petitionController.petition.status <= StatusOrder.taken) {
       return _floatingAction(
         context,
-        label: 'Llamar',
+        label: 'Llamar tienda',
         child: IconButton(
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-          onPressed: () => call(petitionController.petition.user.phone),
+          onPressed: () => call(petitionController.petition.store.contact),
           icon: const Icon(
-            Icons.quick_contacts_dialer_outlined,
+            Icons.storefront_outlined,
             color: kPrimaryColor,
             size: 30,
           ),
@@ -197,15 +197,17 @@ class FloatingSheetBottom extends StatelessWidget {
     return Container();
   }
 
-  Widget _chatClient(BuildContext context) {
+  Widget _chatStore(BuildContext context) {
+    final storeUser = petitionController.petition.store.user;
+
+    if (storeUser == null) return Container();
+
     if (petitionController.petition.status >= StatusOrder.assigned &&
         petitionController.petition.status <= StatusOrder.taken) {
       return _floatingAction(
         context,
-        label: petitionController.petition.user.fullName.isNotEmpty
-            ? petitionController.petition.user.fullName
-            : S.of(context).lClient,
-        child: IconChat(petitionController),
+        label: 'Chat tienda',
+        child: IconStoreChat(petitionController),
       );
     }
     return Container();
@@ -305,6 +307,44 @@ class IconChat extends StatelessWidget {
             toUser: ToUser.fromJson(petitionController.petition.user.toJson()),
             label: S.of(context).lClient,
             imageCompany: petitionController.petition.store.company.image,
+          ),
+          myRol: TypesRol.deliveryman,
+        ),
+      ),
+    );
+  }
+}
+
+class IconStoreChat extends StatelessWidget {
+  const IconStoreChat(
+    this.petitionController, {
+    super.key,
+  });
+
+  final PetitionController petitionController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SheetChatIcon(
+      notifications: 0,
+      goToChatScreen: _goToChatScreen,
+    );
+  }
+
+  _goToChatScreen(BuildContext context) {
+    final storeUser = petitionController.petition.store.user;
+    if (storeUser == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(
+          chatModel: ChatModel(
+            orderId: petitionController.petition.id,
+            toUser: ToUser.fromJson(storeUser.toJson()),
+            label: 'Tienda',
+            imageCompany: petitionController.petition.store.company.image,
+            channel: 'store_deliveryman',
           ),
           myRol: TypesRol.deliveryman,
         ),

@@ -172,6 +172,7 @@ class Store {
     required this.contact,
     // required this.location,
     required this.company,
+    this.user,
   });
 
   int id;
@@ -181,6 +182,7 @@ class Store {
 
   // Location location;
   Company company;
+  User? user;
 
   factory Store.fromJson(Map<String, dynamic> json) => Store(
         id: json["id"],
@@ -189,6 +191,7 @@ class Store {
         contact: json["contact"],
         // location: Location.fromJson(json["location"]),
         company: Company.fromJson(json["company"]),
+        user: json["user"] == null ? null : User.fromJson(json["user"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -198,6 +201,7 @@ class Store {
         "contact": contact,
         // "location": location.toJson(),
         "company": company.toJson(),
+        "user": user?.toJson(),
       };
 }
 
