@@ -13,20 +13,47 @@ const _urlMarkAllRead = 'chat';
 class ChatService {
   final prefs = PreferencesProvider();
 
-  Future<List<ChatMessageModel>> getChats(int orderId) async {
+  Future<List<ChatMessageModel>> getChats(
+    int orderId, {
+    String channel = 'client_deliveryman',
+  }) async {
     List<ChatMessageModel> chatsMessage = [];
     var client = http.Client();
     try {
+      final url = '$kDomain$_urlChat/$orderId?channel=$channel';
+
+      if (kDebugMode) {
+        print('[ChatService] getChats -> url=$url');
+      }
+
       final resp = await client.get(
-        Uri.parse('$kDomain$_urlChat/$orderId'),
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer ${prefs.token}',
         },
       );
+
+      if (kDebugMode) {
+        print('[ChatService] getChats -> status=${resp.statusCode}');
+        print('[ChatService] getChats -> body=${resp.body}');
+      }
+
       if (resp.statusCode != 200) return chatsMessage;
+
       Map<String, dynamic> decodedResp = json.decode(resp.body);
       for (var item in decodedResp['messages']) {
-        chatsMessage.add(ChatMessageModel.fromJson(item));
+        try {
+          chatsMessage.add(ChatMessageModel.fromJson(item));
+        } catch (err) {
+          if (kDebugMode) {
+            print('[ChatService] getChats -> parse item error=$err');
+            print('[ChatService] getChats -> item=$item');
+          }
+        }
+      }
+
+      if (kDebugMode) {
+        print('[ChatService] getChats -> messages=${chatsMessage.length}');
       }
     } catch (err) {
       if (kDebugMode) {
@@ -58,7 +85,11 @@ class ChatService {
     return true;
   }
 
-  Future<bool> markAllRead(String rol, int orderId) async {
+  Future<bool> markAllRead(
+    String rol,
+    int orderId, {
+    String channel = 'client_deliveryman',
+  }) async {
     var client = http.Client();
     try {
       final resp = await client.patch(Uri.parse('$kDomain$_urlMarkAllRead'),
@@ -68,7 +99,8 @@ class ChatService {
           },
           body: jsonEncode({
             "rol": rol,
-            "order": {"id": orderId}
+            "order": {"id": orderId},
+            "channel": channel
           }));
       if (resp.statusCode == 200) return true;
     } catch (err) {

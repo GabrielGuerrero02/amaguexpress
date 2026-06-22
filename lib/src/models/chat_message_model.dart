@@ -10,6 +10,7 @@ class ChatMessageModel {
     this.from,
     this.orderId,
     this.toId,
+    this.channel = 'client_deliveryman',
   });
 
   int id;
@@ -21,6 +22,7 @@ class ChatMessageModel {
   From? from;
   int? orderId;
   int? toId;
+  String channel;
 
   bool isSender(int clientId) {
     return from == null ? true : from!.id == clientId;
@@ -34,6 +36,7 @@ class ChatMessageModel {
         status: json["status"],
         createdAt: DateTime.parse(json["createdAt"]),
         from: From.fromJson(json["from"]),
+        channel: json["channel"] ?? 'client_deliveryman',
       );
 
   Object toHttpBody(String rol) => jsonEncode({
@@ -41,7 +44,8 @@ class ChatMessageModel {
         "type": type,
         "to": {"id": toId},
         "order": {"id": orderId},
-        "rol": rol
+        "rol": rol,
+        "channel": channel
       });
 }
 

@@ -20,7 +20,11 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ChatController>.value(
       value: ChatController(
-          orderId: chatModel.orderId, toId: chatModel.toUser.id, myRol: myRol),
+        orderId: chatModel.orderId,
+        toId: chatModel.toUser.id,
+        myRol: myRol,
+        channel: chatModel.channel,
+      ),
       child: Consumer<ChatController>(
         builder: (context, chatController, child) => PopScope(
           onPopInvoked: (didPop) async {

@@ -11,25 +11,32 @@ class ChatController with ChangeNotifier {
   late int orderId;
   late int toId;
   late String myRol;
+  late String channel;
 
   final TextEditingController _textControlle = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   final List<ChatMessageModel> _messages = [];
 
-  ChatController(
-      {required this.orderId, required this.toId, required this.myRol}) {
+  ChatController({
+    required this.orderId,
+    required this.toId,
+    required this.myRol,
+    this.channel = 'client_deliveryman',
+  }) {
     loadMessages();
-    chatService.markAllRead(myRol, orderId);
+    chatService.markAllRead(myRol, orderId, channel: channel);
     _pushProvider.notifications.listen(evaluateNotification);
   }
 
   markAllRead() {
-    chatService.markAllRead(myRol, orderId);
+    chatService.markAllRead(myRol, orderId, channel: channel);
   }
 
   evaluateNotification(Map<String, dynamic> notification) {
-    if (orderId.toString() == notification['orderId']) {
+    if (orderId.toString() == notification['orderId'] &&
+        (notification['channel'] == null ||
+            notification['channel'] == channel)) {
       switch (notification['type']) {
         case TypesNotification.changeOrderStatust:
           ////>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -40,6 +47,8 @@ class ChatController with ChangeNotifier {
             createdAt: DateTime.now().toUtc(),
             from: From(id: int.parse(notification['fromId'].toString())),
             orderId: int.parse(notification['orderId'].toString()),
+            channel:
+                notification['channel']?.toString() ?? 'client_deliveryman',
           );
           addMessage(chatMessage);
           break;
@@ -70,7 +79,7 @@ class ChatController with ChangeNotifier {
   }
 
   loadMessages() async {
-    messages = await chatService.getChats(orderId);
+    messages = await chatService.getChats(orderId, channel: channel);
     notifyListeners();
   }
 
@@ -81,6 +90,7 @@ class ChatController with ChangeNotifier {
       createdAt: DateTime.now().toUtc(),
       toId: toId,
       orderId: orderId,
+      channel: channel,
     );
     _textControlle.text = '';
     chatService.send(myRol, chatMessage);

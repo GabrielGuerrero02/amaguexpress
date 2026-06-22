@@ -4,11 +4,13 @@ class ChatModel {
     required this.toUser,
     required this.label,
     required this.imageCompany,
+    this.channel = 'client_deliveryman',
   });
 
   int orderId;
   String label;
   String imageCompany;
+  String channel;
   ToUser toUser;
 }
 
