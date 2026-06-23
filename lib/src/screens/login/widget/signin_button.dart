@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:amaguexpress/src/screens/admin/order_monitor/admin_order_monitor_screen.dart';
 import 'package:amaguexpress/constants/types_constant.dart';
 import 'package:amaguexpress/generated/l10n.dart';
 import 'package:amaguexpress/src/models/user_model.dart';
@@ -38,7 +39,10 @@ class SigninButton extends StatelessWidget {
           accessController.resetFailedSigninAttempts();
 
           MaterialPageRoute route;
-          if (userLogin.roles.contains(TypesRol.deliveryman)) {
+          if (userLogin.roles.contains(TypesRol.admin)) {
+            route = MaterialPageRoute(
+                builder: (context) => const AdminOrderMonitorScreen());
+          } else if (userLogin.roles.contains(TypesRol.deliveryman)) {
             route = MaterialPageRoute(
                 builder: (context) => const PetitionsScreen());
           } else if (userLogin.roles.contains(TypesRol.manager)) {

@@ -7,6 +7,7 @@ import 'package:amaguexpress/src/provider/preferences_provider.dart';
 import 'package:amaguexpress/src/screens/about/about_screen.dart';
 import 'package:amaguexpress/src/screens/addresses/addresses_screen.dart';
 import 'package:amaguexpress/src/screens/admin/credit/credit_screen.dart';
+import 'package:amaguexpress/src/screens/admin/order_monitor/admin_order_monitor_screen.dart';
 import 'package:amaguexpress/src/screens/manager/company/company_screen.dart';
 import 'package:amaguexpress/src/screens/manager/enrollment/enrollment_screen.dart';
 import 'package:amaguexpress/src/screens/notification/notification_screen.dart';
@@ -31,6 +32,26 @@ class DraweMenu extends StatelessWidget {
                   margin: EdgeInsets.zero,
                   padding: EdgeInsets.zero,
                   child: Header(pref),
+                ),
+                Visibility(
+                  visible: pref.user.roles.contains(TypesRol.admin),
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: ListTile(
+                      leading: const Icon(Icons.admin_panel_settings_outlined,
+                          color: kPrimaryColor),
+                      title: const Text('Panel administrador'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AdminOrderMonitorScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
                 Visibility(
                   visible: pref.user.roles.contains(TypesRol.admin),
@@ -64,33 +85,39 @@ class DraweMenu extends StatelessWidget {
                                     const NotificacionPage()));
                       }),
                 ),
-                Container(
-                  padding: const EdgeInsets.only(left: 15.0),
-                  child: ListTile(
-                      leading: const Icon(Icons.store_outlined,
-                          color: kPrimaryColor),
-                      title: Text(S.of(context).tStores),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CompanyScreen()));
-                      }),
+                Visibility(
+                  visible: !pref.user.roles.contains(TypesRol.admin),
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: ListTile(
+                        leading: const Icon(Icons.store_outlined,
+                            color: kPrimaryColor),
+                        title: Text(S.of(context).tStores),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CompanyScreen()));
+                        }),
+                  ),
                 ),
-                Container(
-                  padding: const EdgeInsets.only(left: 15.0),
-                  child: ListTile(
-                      leading: const Icon(Icons.pin_drop_outlined,
-                          color: kPrimaryColor),
-                      title: Text(S.of(context).tAddresses),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddressesScreen()));
-                      }),
+                Visibility(
+                  visible: !pref.user.roles.contains(TypesRol.admin),
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: ListTile(
+                        leading: const Icon(Icons.pin_drop_outlined,
+                            color: kPrimaryColor),
+                        title: Text(S.of(context).tAddresses),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AddressesScreen()));
+                        }),
+                  ),
                 ),
               ],
             ),
@@ -189,7 +216,7 @@ class Footer extends StatelessWidget {
     return Column(
       children: [
         Visibility(
-          visible:
+          visible: !pref.user.roles.contains(TypesRol.admin) &&
               !pref.user.roles.contains(TypesRol.deliveryman) && !pref.isGuest,
           child: ListTile(
             leading: const Icon(Icons.app_registration_outlined,
@@ -202,37 +229,43 @@ class Footer extends StatelessWidget {
             },
           ),
         ),
-        ListTile(
-          leading: const Icon(Icons.mode_of_travel, color: kPrimaryColor),
-          title: Text(S.of(context).tAbout),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => AboutScreen()));
-          },
+        Visibility(
+          visible: !pref.user.roles.contains(TypesRol.admin),
+          child: ListTile(
+            leading: const Icon(Icons.mode_of_travel, color: kPrimaryColor),
+            title: Text(S.of(context).tAbout),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AboutScreen()));
+            },
+          ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: Material(
-            color: kPrimaryColor,
-            borderRadius: BorderRadius.circular(12),
-            child: ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              leading:
-                  const Icon(Icons.smart_toy_outlined, color: Colors.white),
-              title: const Text(
-                "Habla con Amagú",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+        Visibility(
+          visible: true,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Material(
+              color: kPrimaryColor,
+              borderRadius: BorderRadius.circular(12),
+              child: ListTile(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                leading:
+                    const Icon(Icons.smart_toy_outlined, color: Colors.white),
+                title: const Text(
+                  "Habla con Amagú",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/chatbot');
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.pushNamed(context, '/chatbot');
-              },
             ),
           ),
         ),

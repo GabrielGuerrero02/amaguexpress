@@ -11,6 +11,7 @@ import 'package:amaguexpress/src/provider/db_provider.dart';
 import 'package:amaguexpress/src/provider/preferences_provider.dart';
 import 'package:amaguexpress/src/provider/push_provider.dart';
 import 'package:amaguexpress/src/screens/cart_summary/cart_summary_controller.dart';
+import 'package:amaguexpress/src/screens/admin/order_monitor/admin_order_monitor_screen.dart';
 import 'package:amaguexpress/src/screens/deliveryman/petitions/petitions_controller.dart';
 import 'package:amaguexpress/src/screens/deliveryman/petitions/petitions_screen.dart';
 import 'package:amaguexpress/src/screens/login/login_controller.dart';
@@ -72,7 +73,9 @@ class MyApp extends StatelessWidget {
         : address == null
             ? 'welcome'
             : 'tabs';
-    if (pref.user.roles.contains(TypesRol.deliveryman)) {
+    if (pref.user.roles.contains(TypesRol.admin)) {
+      initialRoute = 'admin';
+    } else if (pref.user.roles.contains(TypesRol.deliveryman)) {
       initialRoute = 'petitions';
     } else if (pref.user.roles.contains(TypesRol.manager)) {
       initialRoute = 'requests';
@@ -104,6 +107,7 @@ class MyApp extends StatelessWidget {
           'tabs': (BuildContext context) => const TabMainScreen(),
           'petitions': (BuildContext context) => const PetitionsScreen(),
           'requests': (BuildContext context) => const RequestsScreen(),
+          'admin': (BuildContext context) => const AdminOrderMonitorScreen(),
           '/chatbot': (context) => const ChatbotScreen(),
         },
         theme: lightThemeData(context),
