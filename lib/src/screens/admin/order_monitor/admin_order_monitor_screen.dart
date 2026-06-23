@@ -15,6 +15,7 @@ class _AdminOrderMonitorScreenState extends State<AdminOrderMonitorScreen> {
   final AdminOrderMonitorService service = AdminOrderMonitorService();
 
   bool loading = false;
+  bool cancelling = false;
   Map<String, dynamic>? todaySummary;
   Map<String, dynamic>? deliverymenSummary;
   Map<String, dynamic>? storesSummary;
@@ -183,6 +184,159 @@ class _AdminOrderMonitorScreenState extends State<AdminOrderMonitorScreen> {
     }
 
     return 'Prep: $prep min · Retraso ${diff.abs()} min';
+  }
+
+  bool canCancelOrder(Map<String, dynamic> order) {
+    final status = int.tryParse((order['status'] ?? '').toString());
+
+    return status == 0 || status == 1 || status == 100 || status == 101;
+  }
+
+  Future<void> showCancelOrderDialog(Map<String, dynamic> order) async {
+    final orderId = int.tryParse((order['orderId'] ?? '').toString());
+
+    if (orderId == null) {
+      return;
+    }
+
+    final reasonController = TextEditingController();
+    final commentController = TextEditingController();
+
+    final result = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Cancelar pedido #$orderId'),
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              const Text(
+                'Ingresa el motivo de cancelación. Esta acción notificará al cliente.',
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: reasonController,
+                minLines: 2,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Motivo obligatorio',
+                  hintText: 'Ejemplo: tienda cerrada, producto no disponible',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: commentController,
+                minLines: 2,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Comentario opcional',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('No cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final reason = reasonController.text.trim();
+
+              if (reason.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('El motivo de cancelación es obligatorio.'),
+                  ),
+                );
+                return;
+              }
+
+              Navigator.pop(context, {
+                'reason': reason,
+                'comment': commentController.text.trim(),
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Continuar'),
+          ),
+        ],
+      ),
+    );
+
+    reasonController.dispose();
+    commentController.dispose();
+
+    if (result == null) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmación final'),
+        content: Text(
+          '¿Confirmas cancelar el pedido #$orderId?\n\nEsta acción no debe usarse por error.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Volver'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Cancelar pedido'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    await cancelOrder(orderId, result['reason']!, result['comment'] ?? '');
+  }
+
+  Future<void> cancelOrder(
+    int orderId,
+    String reason,
+    String comment,
+  ) async {
+    setState(() => cancelling = true);
+
+    final response = await service.cancelOrder(
+      orderId,
+      reason: reason,
+      comment: comment,
+    );
+
+    if (!mounted) return;
+
+    setState(() => cancelling = false);
+
+    final statusCode = int.tryParse((response?['statusCode'] ?? 0).toString()) ?? 0;
+    final success = response != null && statusCode >= 200 && statusCode < 300;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? 'Pedido #$orderId cancelado correctamente.'
+              : 'No se pudo cancelar el pedido #$orderId.',
+        ),
+        backgroundColor: success ? Colors.green : Colors.red,
+      ),
+    );
+
+    if (success) {
+      await loadDashboard();
+    }
   }
 
   @override
@@ -484,6 +638,21 @@ class _AdminOrderMonitorScreenState extends State<AdminOrderMonitorScreen> {
                 Expanded(child: _infoLine('Delivery', money(order['deliveryFee']))),
               ],
             ),
+            if (canCancelOrder(order)) ...[
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: cancelling ? null : () => showCancelOrderDialog(order),
+                  icon: const Icon(Icons.cancel_outlined),
+                  label: const Text('Cancelar pedido'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                    side: const BorderSide(color: Colors.red),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

@@ -7,6 +7,7 @@ import 'package:amaguexpress/src/provider/preferences_provider.dart';
 import 'package:amaguexpress/src/screens/about/about_screen.dart';
 import 'package:amaguexpress/src/screens/addresses/addresses_screen.dart';
 import 'package:amaguexpress/src/screens/admin/credit/credit_screen.dart';
+import 'package:amaguexpress/src/screens/admin/client_money_top_up/client_money_top_up_screen.dart';
 import 'package:amaguexpress/src/screens/admin/order_monitor/admin_order_monitor_screen.dart';
 import 'package:amaguexpress/src/screens/manager/company/company_screen.dart';
 import 'package:amaguexpress/src/screens/manager/enrollment/enrollment_screen.dart';
@@ -47,6 +48,26 @@ class DraweMenu extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const AdminOrderMonitorScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: pref.user.roles.contains(TypesRol.admin),
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: ListTile(
+                      leading: const Icon(Icons.account_balance_wallet_outlined,
+                          color: kPrimaryColor),
+                      title: const Text('Recarga transferencia'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ClientMoneyTopUpScreen(),
                           ),
                         );
                       },
