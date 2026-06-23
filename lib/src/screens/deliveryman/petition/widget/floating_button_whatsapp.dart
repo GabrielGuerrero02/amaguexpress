@@ -26,16 +26,50 @@ class FloatingButtonWhatsapp extends StatelessWidget {
 
     if (!canChatClient) return const SizedBox.shrink();
 
+    final notifications = petition.notificationsDeliveryman;
+
     return Positioned(
-      top: 190,
+      top: 170,
       right: kDefaultPadding,
-      child: CircularButton(
-        icon: const Icon(
-          Icons.chat_bubble_outline,
-          color: kPrimaryColor,
-          size: 38,
-        ),
-        onPressed: () => _goToChatScreen(context),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          CircularButton(
+            icon: const Icon(
+              Icons.chat_bubble_outline,
+              color: kPrimaryColor,
+              size: 38,
+            ),
+            onPressed: () => _goToChatScreen(context),
+          ),
+          if (notifications > 0)
+            Positioned(
+              top: -4,
+              right: -4,
+              child: Container(
+                constraints: const BoxConstraints(
+                  minWidth: 20,
+                  minHeight: 20,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                decoration: const BoxDecoration(
+                  color: kErrorColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    notifications > 99 ? '99+' : notifications.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

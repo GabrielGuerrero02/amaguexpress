@@ -21,7 +21,7 @@ class FloatingButtonCall extends StatelessWidget {
     if (!canCallStore) return Container();
 
     return Positioned(
-      top: 110,
+      top: 100,
       right: kDefaultPadding,
       child: CircularButton(
         icon: const Icon(Icons.call_outlined, color: kPrimaryColor, size: 40),

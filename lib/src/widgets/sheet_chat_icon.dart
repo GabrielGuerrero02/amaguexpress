@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:amaguexpress/constants/constants.dart';
 
@@ -14,30 +13,47 @@ class SheetChatIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (notifications <= 0) {
-      return IconButton(
-          icon: const Icon(
-            Icons.chat_outlined,
-            color: kPrimaryColor,
-            size: 33,
-          ),
-          onPressed: () => goToChatScreen(context));
-    }
     return GestureDetector(
       onTap: () => goToChatScreen(context),
-      child: badges.Badge(
-        position: badges.BadgePosition.topEnd(top: -5, end: 15),
-        badgeContent: Text(
-          notifications.toString(),
-          style: const TextStyle(color: Colors.white),
-        ),
-        child: IconButton(
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          IconButton(
             icon: const Icon(
               Icons.chat_outlined,
               color: kPrimaryColor,
               size: 33,
             ),
-            onPressed: () => goToChatScreen(context)),
+            onPressed: () => goToChatScreen(context),
+          ),
+          if (notifications > 0)
+            Positioned(
+              top: -2,
+              right: 0,
+              child: Container(
+                constraints: const BoxConstraints(
+                  minWidth: 20,
+                  minHeight: 20,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                decoration: const BoxDecoration(
+                  color: kErrorColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    notifications > 99 ? '99+' : notifications.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      height: 1,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

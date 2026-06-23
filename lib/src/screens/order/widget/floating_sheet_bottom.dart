@@ -51,55 +51,7 @@ class FloatingSheetBottom extends StatelessWidget {
                 children: <Widget>[
                   SizedBox(
                     width: 80,
-                    child: orderController.order.status >=
-                                StatusOrder.assigned &&
-                            orderController.order.status <= StatusOrder.taken
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 0,
-                              horizontal: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? cs.surfaceContainerHighest
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: kPrimaryColor.withOpacity(
-                                  isDark ? 0.35 : 0.25,
-                                ),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black
-                                      .withOpacity(isDark ? 0.35 : 0.12),
-                                  blurRadius: 14,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconChat(orderController),
-                                const SizedBox(height: 2),
-                                Text(
-                                  orderController.order.deliveryman?.fullName ??
-                                      S.of(context).lDeliveryman,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : Container(),
+                    child: _deliverymanChatAction(context),
                   ),
                   SizedBox(
                     height: 70,
@@ -107,7 +59,10 @@ class FloatingSheetBottom extends StatelessWidget {
                         child: AvatarImage(
                             image: orderController.order.store.company.image)),
                   ),
-                  const SizedBox(width: 80),
+                  SizedBox(
+                    width: 80,
+                    child: _storeChatAction(context),
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -147,6 +102,90 @@ class FloatingSheetBottom extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _floatingAction(
+    BuildContext context, {
+    required Widget child,
+    required String label,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      decoration: BoxDecoration(
+        color: isDark ? cs.surfaceContainerHighest : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: kPrimaryColor.withOpacity(isDark ? 0.35 : 0.25),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.35 : 0.12),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 28,
+            width: 28,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: child,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 10,
+              height: 1.0,
+              fontWeight: FontWeight.w600,
+              color: cs.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _deliverymanChatAction(BuildContext context) {
+    if (orderController.order.status >= StatusOrder.assigned &&
+        orderController.order.status <= StatusOrder.taken) {
+      return _floatingAction(
+        context,
+        label: 'Chat motorizado',
+        child: IconChat(orderController),
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
+
+  Widget _storeChatAction(BuildContext context) {
+    final storeUser = orderController.order.store.user;
+
+    if (storeUser == null) return const SizedBox.shrink();
+
+    if (orderController.order.status >= StatusOrder.pendingStoreConfirmation &&
+        orderController.order.status <= StatusOrder.taken) {
+      return _floatingAction(
+        context,
+        label: 'Chat tienda',
+        child: IconStoreChat(orderController),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 }
 
@@ -256,6 +295,45 @@ class IconChat extends StatelessWidget {
                 ToUser.fromJson(orderController.order.deliveryman!.toJson()),
             label: S.of(context).lDeliveryman,
             imageCompany: orderController.order.store.company.image,
+            channel: 'client_deliveryman',
+          ),
+          myRol: TypesRol.client,
+        ),
+      ),
+    );
+  }
+}
+
+class IconStoreChat extends StatelessWidget {
+  const IconStoreChat(
+    this.orderController, {
+    super.key,
+  });
+
+  final OrderController orderController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SheetChatIcon(
+      notifications: 0,
+      goToChatScreen: _goToChatScreen,
+    );
+  }
+
+  void _goToChatScreen(BuildContext context) {
+    final storeUser = orderController.order.store.user;
+    if (storeUser == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(
+          chatModel: ChatModel(
+            orderId: orderController.order.id,
+            toUser: ToUser.fromJson(storeUser.toJson()),
+            label: 'Tienda',
+            imageCompany: orderController.order.store.company.image,
+            channel: 'client_store',
           ),
           myRol: TypesRol.client,
         ),

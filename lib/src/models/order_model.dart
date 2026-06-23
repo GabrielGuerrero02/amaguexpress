@@ -187,18 +187,21 @@ class Store {
     required this.name,
     required this.address,
     required this.company,
+    this.user,
   });
 
   int id;
   String name;
   String address;
   Company company;
+  Deliveryman? user;
 
   factory Store.fromJson(Map<String, dynamic> json) => Store(
         id: json["id"],
         name: json["name"],
         address: json["address"],
         company: Company.fromJson(json["company"]),
+        user: json["user"] == null ? null : Deliveryman.fromJson(json["user"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -206,6 +209,7 @@ class Store {
         "name": name,
         "address": address,
         "company": company.toJson(),
+        "user": user?.toJson(),
       };
 }
 
