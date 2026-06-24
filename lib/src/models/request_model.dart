@@ -13,6 +13,7 @@ class RequestModel {
     required this.createdAt,
     required this.user,
     required this.store,
+    this.deliveryman,
     required this.notificationsDeliveryman,
     required this.payment,
     this.preparationTimeMinutes,
@@ -33,6 +34,7 @@ class RequestModel {
   DateTime createdAt;
   User user;
   Store store;
+  User? deliveryman;
   int notificationsDeliveryman;
   int payment;
   int? preparationTimeMinutes;
@@ -54,6 +56,9 @@ class RequestModel {
         createdAt: DateTime.parse(json["createdAt"]),
         user: User.fromJson(json["user"]),
         store: Store.fromJson(json["store"]),
+        deliveryman: json["deliveryman"] == null
+            ? null
+            : User.fromJson(json["deliveryman"]),
         payment: json["payment"],
         notificationsDeliveryman: json["notificationsDeliveryman"],
         preparationTimeMinutes: json["preparationTimeMinutes"],
@@ -80,6 +85,7 @@ class RequestModel {
         "createdAt": createdAt.toIso8601String(),
         "user": user.toJson(),
         "store": store.toJson(),
+        "deliveryman": deliveryman?.toJson(),
         "payment": payment,
         "notificationsDeliveryman": notificationsDeliveryman,
         "preparationTimeMinutes": preparationTimeMinutes,

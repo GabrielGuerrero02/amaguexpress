@@ -6,6 +6,9 @@ import 'package:amaguexpress/generated/l10n.dart';
 import 'package:amaguexpress/src/screens/manager/request/request_controller.dart';
 import 'package:amaguexpress/src/screens/manager/request/widget/details_products.dart';
 import 'package:amaguexpress/src/widgets/avatar_image.dart';
+import 'package:amaguexpress/src/widgets/sheet_chat_icon.dart';
+import 'package:amaguexpress/src/screens/chat/chat_screen.dart';
+import 'package:amaguexpress/src/models/chat_model.dart';
 
 class FloatingSheetBottom extends StatelessWidget {
   final RequestController requestController;
@@ -44,6 +47,7 @@ class FloatingSheetBottom extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
+                  IconManagerClientChat(requestController),
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
@@ -71,6 +75,9 @@ class FloatingSheetBottom extends StatelessWidget {
                       ),
                     ),
                   ),
+                  requestController.request.deliveryman == null
+                      ? const SizedBox(height: 58, width: 58)
+                      : IconManagerDeliverymanChat(requestController),
                 ],
               ),
               const SizedBox(height: 20),
@@ -117,6 +124,81 @@ class FloatingSheetBottom extends StatelessWidget {
               DetailsProducts(request: requestController.request),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class IconManagerClientChat extends StatelessWidget {
+  const IconManagerClientChat(
+    this.requestController, {
+    super.key,
+  });
+
+  final RequestController requestController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SheetChatIcon(
+      notifications: requestController.request.notificationsDeliveryman,
+      goToChatScreen: _goToChatScreen,
+    );
+  }
+
+  void _goToChatScreen(BuildContext context) {
+    requestController.cleanNotificationsClient();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(
+          chatModel: ChatModel(
+            orderId: requestController.request.id,
+            toUser: ToUser.fromJson(requestController.request.user.toJson()),
+            label: S.of(context).lClient,
+            imageCompany: requestController.request.store.company.image,
+            channel: 'client_store',
+          ),
+          myRol: TypesRol.manager,
+        ),
+      ),
+    );
+  }
+}
+
+class IconManagerDeliverymanChat extends StatelessWidget {
+  const IconManagerDeliverymanChat(
+    this.requestController, {
+    super.key,
+  });
+
+  final RequestController requestController;
+
+  @override
+  Widget build(BuildContext context) {
+    return SheetChatIcon(
+      notifications: 0,
+      goToChatScreen: _goToChatScreen,
+    );
+  }
+
+  void _goToChatScreen(BuildContext context) {
+    final deliveryman = requestController.request.deliveryman;
+    if (deliveryman == null) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatScreen(
+          chatModel: ChatModel(
+            orderId: requestController.request.id,
+            toUser: ToUser.fromJson(deliveryman.toJson()),
+            label: S.of(context).lDeliveryman,
+            imageCompany: requestController.request.store.company.image,
+            channel: 'store_deliveryman',
+          ),
+          myRol: TypesRol.manager,
         ),
       ),
     );
