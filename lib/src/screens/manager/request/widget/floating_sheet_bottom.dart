@@ -3,10 +3,10 @@ import 'package:amaguexpress/constants/constants.dart';
 import 'package:amaguexpress/constants/status_constant.dart';
 import 'package:amaguexpress/constants/types_constant.dart';
 import 'package:amaguexpress/generated/l10n.dart';
+import 'package:amaguexpress/src/common/launch.dart';
 import 'package:amaguexpress/src/screens/manager/request/request_controller.dart';
 import 'package:amaguexpress/src/screens/manager/request/widget/details_products.dart';
 import 'package:amaguexpress/src/widgets/avatar_image.dart';
-import 'package:amaguexpress/src/widgets/sheet_chat_icon.dart';
 import 'package:amaguexpress/src/screens/chat/chat_screen.dart';
 import 'package:amaguexpress/src/models/chat_model.dart';
 
@@ -47,7 +47,9 @@ class FloatingSheetBottom extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  IconManagerClientChat(requestController),
+                  requestController.request.deliveryman == null
+                      ? const SizedBox(height: 58, width: 58)
+                      : IconManagerDeliverymanChat(requestController),
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
@@ -77,7 +79,7 @@ class FloatingSheetBottom extends StatelessWidget {
                   ),
                   requestController.request.deliveryman == null
                       ? const SizedBox(height: 58, width: 58)
-                      : IconManagerDeliverymanChat(requestController),
+                      : IconManagerDeliverymanCall(requestController),
                 ],
               ),
               const SizedBox(height: 20),
@@ -130,43 +132,6 @@ class FloatingSheetBottom extends StatelessWidget {
   }
 }
 
-class IconManagerClientChat extends StatelessWidget {
-  const IconManagerClientChat(
-    this.requestController, {
-    super.key,
-  });
-
-  final RequestController requestController;
-
-  @override
-  Widget build(BuildContext context) {
-    return SheetChatIcon(
-      notifications: requestController.request.notificationsDeliveryman,
-      goToChatScreen: _goToChatScreen,
-    );
-  }
-
-  void _goToChatScreen(BuildContext context) {
-    requestController.cleanNotificationsClient();
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ChatScreen(
-          chatModel: ChatModel(
-            orderId: requestController.request.id,
-            toUser: ToUser.fromJson(requestController.request.user.toJson()),
-            label: S.of(context).lClient,
-            imageCompany: requestController.request.store.company.image,
-            channel: 'client_store',
-          ),
-          myRol: TypesRol.manager,
-        ),
-      ),
-    );
-  }
-}
-
 class IconManagerDeliverymanChat extends StatelessWidget {
   const IconManagerDeliverymanChat(
     this.requestController, {
@@ -177,15 +142,19 @@ class IconManagerDeliverymanChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SheetChatIcon(
-      notifications: 0,
-      goToChatScreen: _goToChatScreen,
+    return _ManagerActionButton(
+      icon: Icons.chat_outlined,
+      label: 'Chat motorizado',
+      notifications: requestController.notificationsStoreDeliverymanChat,
+      onPressed: () => _goToChatScreen(context),
     );
   }
 
   void _goToChatScreen(BuildContext context) {
     final deliveryman = requestController.request.deliveryman;
     if (deliveryman == null) return;
+
+    requestController.cleanNotificationsDeliveryman();
 
     Navigator.push(
       context,
@@ -201,6 +170,124 @@ class IconManagerDeliverymanChat extends StatelessWidget {
           myRol: TypesRol.manager,
         ),
       ),
+    );
+  }
+}
+
+class IconManagerDeliverymanCall extends StatelessWidget {
+  const IconManagerDeliverymanCall(
+    this.requestController, {
+    super.key,
+  });
+
+  final RequestController requestController;
+
+  @override
+  Widget build(BuildContext context) {
+    final deliveryman = requestController.request.deliveryman;
+
+    if (deliveryman == null) {
+      return const SizedBox(height: 58, width: 92);
+    }
+
+    return _ManagerActionButton(
+      icon: Icons.call_outlined,
+      label: 'Llamar motorizado',
+      onPressed: () {
+        call(deliveryman.phone);
+      },
+    );
+  }
+}
+
+class _ManagerActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final int notifications;
+
+  const _ManagerActionButton({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.notifications = 0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Material(
+          color: isDark ? cs.surfaceContainerHighest : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          elevation: 8,
+          shadowColor: Colors.black.withOpacity(isDark ? 0.35 : 0.12),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: onPressed,
+            child: Container(
+              width: 92,
+              height: 58,
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: kPrimaryColor.withOpacity(isDark ? 0.35 : 0.18),
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: kPrimaryColor, size: 22),
+                  const SizedBox(height: 4),
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: cs.onSurface,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (notifications > 0)
+          Positioned(
+            top: -5,
+            right: -5,
+            child: Container(
+              constraints: const BoxConstraints(
+                minWidth: 20,
+                minHeight: 20,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: const BoxDecoration(
+                color: kErrorColor,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  notifications > 99 ? '99+' : notifications.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    height: 1,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

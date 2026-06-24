@@ -120,6 +120,12 @@ class _ContentRequestState extends State<ContentRequest>
               },
             ),
             FloatingHead(requestController: widget.requestController),
+            FloatingClientCallButton(
+              requestController: widget.requestController,
+            ),
+            FloatingClientChatButton(
+              requestController: widget.requestController,
+            ),
             FloatingSheetBottom(requestController: widget.requestController),
           ],
         ),

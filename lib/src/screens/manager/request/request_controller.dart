@@ -22,6 +22,8 @@ class RequestController extends ChangeNotifier {
   final Completer<GoogleMapController> _completer = Completer();
   GoogleMapController? _mapController;
   bool _isDisposed = false;
+  int _notificationsClientStoreChat = 0;
+  int _notificationsStoreDeliverymanChat = 0;
   int _preparationTimeMinutes = 15;
 
   late CameraPosition initialCameraPosition;
@@ -45,7 +47,14 @@ class RequestController extends ChangeNotifier {
           refreshRequest();
           break;
         case TypesNotification.messageChat:
-          request.notificationsDeliveryman++;
+          final channel = notification['channel']?.toString();
+
+          if (channel == 'client_store') {
+            _notificationsClientStoreChat++;
+          } else if (channel == 'store_deliveryman') {
+            _notificationsStoreDeliverymanChat++;
+          }
+
           notifyListeners();
           break;
         default:
@@ -73,8 +82,19 @@ class RequestController extends ChangeNotifier {
     }
   }
 
+  int get notificationsClientStoreChat => _notificationsClientStoreChat;
+
+  int get notificationsStoreDeliverymanChat =>
+      _notificationsStoreDeliverymanChat;
+
   cleanNotificationsClient() {
+    _notificationsClientStoreChat = 0;
     _request.notificationsDeliveryman = 0;
+    notifyListeners();
+  }
+
+  cleanNotificationsDeliveryman() {
+    _notificationsStoreDeliverymanChat = 0;
     notifyListeners();
   }
 

@@ -21,6 +21,8 @@ class PetitionController extends ChangeNotifier {
   final Completer<GoogleMapController> _completer = Completer();
   GoogleMapController? _mapController;
   bool _isDisposed = false;
+  int _notificationsClientDeliverymanChat = 0;
+  int _notificationsStoreDeliverymanChat = 0;
 
   late CameraPosition initialCameraPosition;
 
@@ -28,6 +30,7 @@ class PetitionController extends ChangeNotifier {
     // Clone the object, avoiding duplicate increases in the number of messages received.
     // PetitionsController _pushProvider AND PetitionController _pushProvider
     _petition = PetitionModel.fromJson(petition.toJson());
+    _notificationsClientDeliverymanChat = _petition.notificationsDeliveryman;
 
     initialCameraPosition = CameraPosition(
         target: LatLng(petition.location.x, petition.location.y), zoom: 16);
@@ -43,7 +46,16 @@ class PetitionController extends ChangeNotifier {
           refreshPetition();
           break;
         case TypesNotification.messageChat:
-          petition.notificationsDeliveryman++;
+          final channel = notification['channel']?.toString();
+
+          if (channel == 'store_deliveryman') {
+            _notificationsStoreDeliverymanChat++;
+          } else if (channel == 'client_deliveryman' || channel == null) {
+            _notificationsClientDeliverymanChat++;
+            petition.notificationsDeliveryman =
+                _notificationsClientDeliverymanChat;
+          }
+
           notifyListeners();
           break;
         default:
@@ -71,8 +83,20 @@ class PetitionController extends ChangeNotifier {
     }
   }
 
+  int get notificationsClientDeliverymanChat =>
+      _notificationsClientDeliverymanChat;
+
+  int get notificationsStoreDeliverymanChat =>
+      _notificationsStoreDeliverymanChat;
+
   cleanNotificationsClient() {
+    _notificationsClientDeliverymanChat = 0;
     _petition.notificationsDeliveryman = 0;
+    notifyListeners();
+  }
+
+  cleanNotificationsStore() {
+    _notificationsStoreDeliverymanChat = 0;
     notifyListeners();
   }
 

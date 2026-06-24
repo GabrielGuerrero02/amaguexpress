@@ -28,6 +28,8 @@ class OrderController extends ChangeNotifier {
   final Completer<GoogleMapController> _completer = Completer();
   GoogleMapController? _mapController;
   bool _isDisposed = false;
+  int _notificationsClientDeliverymanChat = 0;
+  int _notificationsClientStoreChat = 0;
   late CameraPosition initialCameraPosition;
 
   OrderController(OrderModel order) {
@@ -38,6 +40,7 @@ class OrderController extends ChangeNotifier {
     try {
       //print('Antes de deserializar OrderModel');
       _order = OrderModel.fromJson(order.toJson());
+      _notificationsClientDeliverymanChat = _order.notificationsClient;
       //print('Después de deserializar OrderModel');
     } catch (e, stack) {
       debugPrint('Error al deserializar OrderModel en OrderController: $e');
@@ -58,7 +61,15 @@ class OrderController extends ChangeNotifier {
           refreshOrder();
           break;
         case TypesNotification.messageChat:
-          order.notificationsClient++;
+          final channel = notification['channel']?.toString();
+
+          if (channel == 'client_store') {
+            _notificationsClientStoreChat++;
+          } else if (channel == 'client_deliveryman' || channel == null) {
+            _notificationsClientDeliverymanChat++;
+            order.notificationsClient = _notificationsClientDeliverymanChat;
+          }
+
           notifyListeners();
           break;
         default:
@@ -75,8 +86,19 @@ class OrderController extends ChangeNotifier {
     onListenerPositions();
   }
 
+  int get notificationsClientDeliverymanChat =>
+      _notificationsClientDeliverymanChat;
+
+  int get notificationsClientStoreChat => _notificationsClientStoreChat;
+
   cleanNotificationsClient() {
+    _notificationsClientDeliverymanChat = 0;
     order.notificationsClient = 0;
+    notifyListeners();
+  }
+
+  cleanNotificationsStore() {
+    _notificationsClientStoreChat = 0;
     notifyListeners();
   }
 

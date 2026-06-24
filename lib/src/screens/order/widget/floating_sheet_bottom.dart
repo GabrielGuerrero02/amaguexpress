@@ -277,7 +277,7 @@ class IconChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SheetChatIcon(
-        notifications: orderController.order.notificationsClient,
+        notifications: orderController.notificationsClientDeliverymanChat,
         goToChatScreen: _goToChatScreen);
   }
 
@@ -315,7 +315,7 @@ class IconStoreChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SheetChatIcon(
-      notifications: 0,
+      notifications: orderController.notificationsClientStoreChat,
       goToChatScreen: _goToChatScreen,
     );
   }
@@ -323,6 +323,8 @@ class IconStoreChat extends StatelessWidget {
   void _goToChatScreen(BuildContext context) {
     final storeUser = orderController.order.store.user;
     if (storeUser == null) return;
+
+    orderController.cleanNotificationsStore();
 
     Navigator.push(
       context,
