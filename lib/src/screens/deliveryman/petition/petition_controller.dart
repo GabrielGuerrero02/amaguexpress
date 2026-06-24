@@ -40,6 +40,10 @@ class PetitionController extends ChangeNotifier {
   }
 
   evaluateNotification(Map<String, dynamic> notification) async {
+    debugPrint('[PETITION PUSH] notification=$notification');
+    debugPrint(
+        '[PETITION PUSH] channel=${notification['channel']} type=${notification['type']} orderId=${notification['orderId']}');
+
     if (petition.id.toString() == notification['orderId']) {
       switch (notification['type']) {
         case TypesNotification.changeOrderStatust:
